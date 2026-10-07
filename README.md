@@ -21,7 +21,11 @@ npm run check
 npm run build
 ```
 
-Website tĩnh được tạo trong thư mục `dist/`. Cấu hình hosting dùng lệnh build `npm run build`, thư mục đầu ra `dist`. Repository chưa tự cấu hình triển khai; đẩy code lên GitHub chưa đồng nghĩa website đã được xuất bản.
+Website tĩnh được tạo trong thư mục `dist/`. Cấu hình hosting dùng lệnh build `npm run build`, thư mục đầu ra `dist`. Đã cấu hình GitHub Actions trong `.github/workflows/deploy-pages.yml`: mỗi lần cập nhật nhánh `main`, hệ thống kiểm tra JavaScript, build và triển khai GitHub Pages.
+
+Thiết lập một lần tại **Settings → Pages → Build and deployment → Source → GitHub Actions**. Nếu Pages chưa bật, job build vẫn chạy nhưng bước triển khai sẽ thất bại cho đến khi hoàn tất thiết lập này.
+
+Xem tiến trình trong tab **Actions → Deploy Luân Design Studio**. Sau khi triển khai thành công, GitHub hiển thị URL website trong môi trường `github-pages`. Có thể chạy lại thủ công bằng **Run workflow**.
 
 ## Chức năng đã có
 
