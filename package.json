@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "check": "node --check assets/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs",
-    "build": "node scripts/build.mjs"
+    "check": "node --check assets/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs && node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "deploy": "npm run check && npm run build && npx wrangler@4 deploy"
   },
   "engines": {
     "node": ">=20"
