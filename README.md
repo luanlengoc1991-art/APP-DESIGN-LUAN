@@ -27,22 +27,17 @@ Thiết lập một lần tại **Settings → Pages → Build and deployment �
 
 Xem tiến trình trong tab **Actions → Deploy Luân Design Studio**. Sau khi triển khai thành công, GitHub hiển thị URL website trong môi trường `github-pages`. Có thể chạy lại thủ công bằng **Run workflow**.
 
-## Triển khai Cloudflare (khuyến nghị Workers Static Assets)
+## Triển khai Cloudflare
 
-Repository có `wrangler.jsonc`, phục vụ website tĩnh trực tiếp, không cần Worker backend hoặc biến môi trường. Build không cài dependency và chỉ xuất HTML, CSS/JS có fingerprint cùng cấu hình header và trang 404.
+Website chạy trên Cloudflare Workers Static Assets, Worker `app-design-luan`, đã nối với repository GitHub này. Mỗi lần cập nhật nhánh `main`, Cloudflare Workers Builds chạy `npx wrangler deploy`.
 
-Để tự động triển khai khi push `main`, vào Cloudflare **Workers & Pages → Create → Import a repository**, kết nối GitHub và chọn repository này. Thiết lập:
+Lệnh deploy đọc `build.command` trong `wrangler.jsonc` (`node scripts/build.mjs`) và tạo thư mục `dist/` ngay trước khi tải website lên. Build không cài dependency. Worker name trong dashboard phải giữ là `app-design-luan` để khớp `name` trong `wrangler.jsonc`.
 
-| Trường | Giá trị |
-| --- | --- |
-| Worker name | `app-design-luan` (khớp `name` trong `wrangler.jsonc`) |
-| Production branch | `main` |
-| Root directory | Gốc repository |
-| Build command | `npm run check && npm run build` |
-| Deploy command | `npx wrangler@4 deploy` |
-| Node.js | 22 trở lên (`NODE_VERSION=22` nếu cần) |
+Địa chỉ website:
 
-Chọn Deploy. Sau khi kết nối Git, Cloudflare tự build và deploy các lần push tiếp theo. Nếu đặt tên Worker khác, sửa `name` trong `wrangler.jsonc` cho khớp. Không commit token Cloudflare vào source.
+https://app-design-luan.luanlengoc1991.workers.dev
+
+Tiến trình build nằm trong Cloudflare dashboard: **Workers & Pages → app-design-luan → Deployments**. Không commit token Cloudflare vào source.
 
 Triển khai thủ công trên máy đã đăng nhập Cloudflare:
 
@@ -51,13 +46,11 @@ npx wrangler@4 login
 npm run deploy
 ```
 
-**Nếu dùng Cloudflare Pages:** tạo Pages project qua Git integration; chọn framework **None**, build command `npm run check && npm run build`, output directory `dist`, nhánh `main`, Node 22. `wrangler.jsonc` trong repo dành cho Workers; không chạy `wrangler deploy` để triển khai Pages. Không cần cấu hình SPA hay Functions vì app chỉ có một trang.
-
 CSS/JS trong `dist/assets` có hash nội dung và cache một năm với `immutable`; HTML kiểm tra lại cache để lấy tên asset mới. `_headers` được Cloudflare áp dụng, GitHub Pages bỏ qua. Các đường dẫn asset tương đối vẫn dùng được trên GitHub Pages. Trang 404 trả về cho đường dẫn không tồn tại thay vì tải nhầm HTML như JavaScript.
 
 Canvas gom các sự kiện kéo vào một lần vẽ mỗi frame, thumbnail layer được dùng lại khi nội dung không đổi. Dữ liệu IndexedDB thuộc từng domain: muốn chuyển từ GitHub Pages sang Cloudflare, tải dự án JSON từ domain cũ rồi mở lại ở domain mới.
 
-Workflow GitHub Pages vẫn được giữ. Kết nối Cloudflare và lần deploy thật cần thực hiện trong tài khoản Cloudflare; cấu hình source không tự tạo project trong tài khoản.
+Workflow GitHub Pages vẫn được giữ song song.
 
 ## Chức năng đã có
 
