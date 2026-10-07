@@ -1,0 +1,15 @@
+{
+  "name": "app-design-luan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Luân Design Studio — trình chỉnh sửa layer trên trình duyệt",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "check": "node --check assets/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs",
+    "build": "node scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
