@@ -26,6 +26,8 @@ test('deployment assets match their fingerprints and work below a path prefix', 
   assert.match(headers, /\/index\.html\n\s+Cache-Control: no-cache/);
   assert.match(await readFile(new URL('../dist/404.html', import.meta.url), 'utf8'), /Không tìm thấy trang/);
   const config = JSON.parse(await readFile(new URL('../wrangler.jsonc', import.meta.url), 'utf8'));
+  assert.equal(config.name, 'app-design-luan');
+  assert.equal(config.build.command, 'node scripts/build.mjs');
   assert.equal(config.assets.directory, './dist');
   assert.equal(config.assets.not_found_handling, '404-page');
   execFileSync(process.execPath, ['scripts/build.mjs'], { cwd: root });
