@@ -66,15 +66,38 @@ Workflow GitHub Pages vẫn được giữ song song.
 - Lưu/mở dự án JSON; lưu bản hiện tại trong IndexedDB của trình duyệt.
 - Tổng hợp video trong nút “Đọc nội dung video”, dựa trên khung hình và thao tác nhìn thấy; chưa phiên âm âm thanh.
 
-## Chưa có AI và backend
+## Kích hoạt AI trên Cloudflare Workers
 
-**Bản hiện tại là trình chỉnh sửa thủ công, chưa kết nối dịch vụ AI.**
+Đã tích hợp API thật qua hàng đợi fal.ai; chưa thể thực hiện inference nếu tài khoản triển khai chưa có secrets.
 
-Các mục phục dựng ảnh, thiết kế theo nội dung, biển bảng, phối cảnh, xử lý file in và CNC chỉ hỗ trợ soạn/tải yêu cầu thiết kế. Chưa có tự nhận diện đối tượng, bóc tách toàn bộ layer bằng AI, dựng lại nền bị che, tạo ảnh hoặc tạo đường cắt CNC.
+| Công cụ | Model |
+| --- | --- |
+| Tách poster thành 2–8 layer PNG/RGBA | `fal-ai/qwen-image-layered` |
+| Xoá nền người/sản phẩm | `fal-ai/ben/v2/image` |
+| Làm nét, tăng độ phân giải 2× | `fal-ai/esrgan` (không bật phục dựng mặt) |
+| Tạo ảnh theo nội dung | `fal-ai/qwen-image` |
+| Chỉnh ảnh theo mô tả, phối cảnh | `fal-ai/qwen-image-edit-2511` |
 
-Để bổ sung cần backend xử lý ảnh, dịch vụ AI phù hợp, xác thực, quản lý chi phí và lưu trữ. Giữ khoá API ở backend, không đặt trong HTML/JavaScript hoặc commit vào GitHub.
+1. Tạo tài khoản [fal.ai](https://fal.ai/), bổ sung số dư và lấy key tại [Dashboard → Keys](https://fal.ai/dashboard/keys). Dịch vụ tính phí theo tác vụ/model; kiểm tra mức phí và giới hạn tài khoản tại fal.ai trước khi dùng.
+2. Vào Cloudflare **Workers & Pages → app-design-luan → Settings → Variables and Secrets**, thêm hai biến **Secret**:
+   - `FAL_KEY`: khoá fal.ai. Chỉ nằm ở Worker, không nhập vào website hoặc commit GitHub.
+   - `AI_ACCESS_TOKEN`: tự đặt mã truy cập riêng, ít nhất 16 ký tự ngẫu nhiên. Mã này dùng để mở quyền AI trên website, không phải khoá fal.ai.
+3. Lưu và triển khai bản mới từ nhánh `main`. Nếu Cloudflare Git integration đã bật, commit mới tự kích hoạt build; nếu chưa bật, kết nối repository hoặc chạy `npm run deploy` trên máy đã đăng nhập.
+4. Trên website, mở **Mở quyền sử dụng AI**, nhập mã `AI_ACCESS_TOKEN`. Mã chỉ giữ trong bộ nhớ tab và mất khi tải lại, không lưu trong localStorage/sessionStorage.
 
-Không có đăng nhập hoặc đồng bộ cloud. Ảnh nhập được xử lý trong trình duyệt, không gửi lên máy chủ. Bản lưu trình duyệt có thể mất khi xoá dữ liệu; tải JSON để sao lưu hoặc chuyển máy.
+**Tách poster:** tải ảnh (layer vừa nhập được chọn tự động), chọn tác vụ tách layer và 2–8 layer mong muốn, bấm **Bắt đầu xử lý AI**. Có thể chọn toàn bộ thiết kế đang hiển thị thay vì layer đang chọn. Chờ kết quả, xem trước từng layer rồi bấm **Thêm vào thiết kế**. Layer nguồn được giữ và ẩn; PNG mới đặt trên đúng vùng ảnh đầu vào. Có thể đổi tên, kéo, thay thứ tự, xuất từng PNG hoặc ZIP. Mô tả trong tác vụ tách là caption giúp model hiểu ảnh; không đảm bảo tách đúng từng đối tượng theo danh sách.
+
+Tác vụ giữ trong sessionStorage dưới dạng mã được ký, không lưu ảnh đầu vào ở đó. Sau khi tải lại cùng tab, mở quyền AI rồi bấm **Kiểm tra kết quả** để lấy lại tác vụ trong 24 giờ. Phải giữ/mở lại đúng dự án ban đầu để thêm kết quả; nếu dự án đã đổi, ứng dụng chặn nhập và cho tải ZIP. **Tạm dừng theo dõi** chỉ dừng polling; **Huỷ tác vụ** gửi yêu cầu huỷ nhưng tác vụ đã xử lý vẫn có thể tính phí. **Bỏ khỏi phiên** không huỷ tác vụ trên fal.ai. Không tự gửi lại yêu cầu AI khi polling hoặc tải kết quả lỗi.
+
+Ảnh đầu vào AI giảm xuống cạnh 1.536 px (2.048 px khi upscale), giữ alpha PNG; kết quả không khôi phục độ phân giải gốc bằng cách đặt lại vào khung lớn. Chất lượng cần kiểm tra trên poster thực tế, đặc biệt chữ tiếng Việt, logo, khuôn mặt và chi tiết nhỏ. AI là xử lý tạo sinh; không bảo đảm giữ mặt 100%. Chữ tách là ảnh raster, chưa có OCR/text có thể sửa; không khôi phục chính xác layer PSD/AI/CDR/Canva. Phối cảnh/file in không được hiệu chỉnh kỹ thuật tự động; chưa tạo đường cắt CNC/vector chuẩn.
+
+Ảnh dùng công cụ thủ công vẫn xử lý cục bộ. Khi chạy AI, ảnh được gửi đến fal.ai và kết quả nằm trên hệ thống của nhà cung cấp theo chính sách của họ. App tải kết quả về ảnh nhúng PNG để lưu dự án JSON. Chưa có R2/cloud project storage hoặc đồng bộ nhiều máy; dùng JSON để sao lưu.
+
+Backend chỉ cho các model đã định sẵn, xác thực mọi request có phí, kiểm tra Origin, giới hạn dung lượng, ký mã tác vụ/kết quả có hạn, chặn proxy URL tuỳ ý và không trả provider key cho client. Mã truy cập là quyền của chủ website; chưa có tài khoản người dùng, hạn mức riêng, Turnstile hay quản trị chi phí đa người dùng. Chỉ chia sẻ mã với người được phép sử dụng số dư fal.ai. API trả `no-store`; asset tĩnh vẫn đi trực tiếp qua Cloudflare.
+
+Chạy backend trên máy cá nhân: copy `.dev.vars.example` thành `.dev.vars`, điền secrets cục bộ rồi chạy `npm run dev:ai`. `.dev.vars` đã được bỏ qua bởi Git. `npm run dev` chỉ chạy giao diện tĩnh.
+
+Tài liệu chính thức: [Layered model](https://fal.ai/models/fal-ai/qwen-image-layered/api), [Queue API](https://fal.ai/docs/documentation/model-apis/inference/queue), [Cloudflare routing](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/).
 
 ## Giới hạn và xuất in
 
@@ -91,6 +114,8 @@ Không có đăng nhập hoặc đồng bộ cloud. Ảnh nhập được xử l
 | --- | --- |
 | `index.html` | Giao diện, hộp thoại và biểu tượng |
 | `assets/styles.css` | Giao diện responsive |
+| `assets/ai.js` | Giao diện AI, theo dõi queue, xem trước và nhập layer |
+| `worker/index.mjs` | Backend AI và bảo vệ provider key |
 | `assets/app.js` | Canvas/layer, xuất file, lưu dự án, tổng hợp video |
 | `scripts/serve.mjs` | Máy chủ phát triển cục bộ |
 | `scripts/build.mjs` | Build asset fingerprint vào `dist/` |
@@ -102,4 +127,4 @@ Không lưu ảnh/video đầu vào hoặc dự án cá nhân trong repository. 
 
 ## Kiểm tra
 
-Đã kiểm tra cú pháp JavaScript, canvas mẫu sáu layer, kích thước PNG, độ trong suốt của layer riêng, XML của SVG, checksum ZIP và tiếng Việt, cấu trúc dự án và chặn ảnh URL bên ngoài trong JSON. Chạy `npm run check` để kiểm tra cú pháp, fingerprint asset, build lặp lại, đường dẫn root/subpath, header và cơ chế render/thumbnail. Chưa kiểm thử toàn bộ thao tác trên trình duyệt thực hoặc triển khai Cloudflare thật.
+Đã kiểm tra cú pháp JavaScript, canvas mẫu sáu layer, kích thước PNG, độ trong suốt của layer riêng, XML của SVG, checksum ZIP và tiếng Việt, cấu trúc dự án và chặn ảnh URL bên ngoài trong JSON. Chạy `npm run check` để kiểm tra cú pháp, fingerprint asset, build lặp lại, đường dẫn root/subpath, header và cơ chế render/thumbnail. Kiểm tra thêm luồng AI bằng provider/DOM mô phỏng: xác thực, payload, queue, tải ảnh, huỷ, nhập layer đúng vị trí, chặn kết quả trễ và xuất ZIP. Chưa chạy inference với key thật hoặc kiểm thử chất lượng model trên poster thật.

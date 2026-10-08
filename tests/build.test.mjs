@@ -10,7 +10,7 @@ test('deployment assets match their fingerprints and work below a path prefix', 
   execFileSync(process.execPath, ['scripts/build.mjs'], { cwd: root });
   const html = await readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
   const names = await readdir(new URL('../dist/assets/', import.meta.url));
-  assert.equal(names.length, 2);
+  assert.equal(names.length, 3);
   for (const name of names) {
     const bytes = await readFile(new URL(`../dist/assets/${name}`, import.meta.url));
     const hash = createHash('sha256').update(bytes).digest('hex').slice(0, 16);
@@ -20,7 +20,7 @@ test('deployment assets match their fingerprints and work below a path prefix', 
       assert.equal(new URL(`./assets/${name}`, base).pathname, new URL(base).pathname + `assets/${name}`);
     }
   }
-  assert.doesNotMatch(html, /\.\/assets\/(app\.js|styles\.css)/);
+  assert.doesNotMatch(html, /\.\/assets\/(app\.js|ai\.js|styles\.css)/);
   const headers = await readFile(new URL('../dist/_headers', import.meta.url), 'utf8');
   assert.match(headers, /\/assets\/\*\n\s+Cache-Control: public, max-age=31536000, immutable/);
   assert.match(headers, /\/index\.html\n\s+Cache-Control: no-cache/);
