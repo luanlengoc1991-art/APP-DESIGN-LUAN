@@ -1,3 +1,5 @@
 # Local development only. Do not commit real values.
 FAL_KEY=
 AI_ACCESS_TOKEN=
+# RevidAPI: image generation + background removal. Optional FAL_KEY for layers.
+REVID_API_KEY=

@@ -68,14 +68,33 @@ Workflow GitHub Pages vẫn được giữ song song.
 
 ## Kích hoạt AI trên Cloudflare Workers
 
-Đã tích hợp API thật qua hàng đợi fal.ai; chưa thể thực hiện inference nếu tài khoản triển khai chưa có secrets.
+Đã tích hợp RevidAPI cho tạo ảnh và xoá nền; giữ fal.ai cho tách poster nhiều layer và các tác vụ riêng. Chưa thể thực hiện inference nếu tài khoản triển khai chưa có secrets.
+
+### Dùng tài khoản RevidAPI của anh
+
+1. Lấy khoá trong [RevidAPI Dashboard](https://revidapi.com/dashboard); trang [Usage](https://revidapi.com/dashboard/usage) quản lý credit/lượt dùng.
+2. Trong Cloudflare **Workers & Pages → app-design-luan → Settings → Variables and Secrets**, thêm secret `REVID_API_KEY` chứa khoá RevidAPI. Không đặt khoá này trong `FAL_KEY`.
+3. Thêm/giữ `AI_ACCESS_TOKEN`: mã truy cập riêng ít nhất 16 ký tự ngẫu nhiên. Deploy lại bản mới, rồi nhập mã này trong mục mở quyền AI trên website.
+
+Nếu chỉ cấu hình RevidAPI, website bật **Tạo ảnh theo nội dung** (`gpt-image-2`) và **Xoá nền AI** (`u2net`). Backend dùng tài liệu hiện tại: `POST /v1/images/generations`, polling `GET /v1/images/jobs/{id}`; xoá nền bằng upload file qua `POST /v1/remove-background`, polling `GET /v1/job/status/{task_id}`. Hỗ trợ kết quả ảnh trả ngay và kết quả qua hàng đợi. Không tự gửi lại yêu cầu có phí hoặc thử endpoint khác khi lỗi.
+
+Chưa thấy endpoint/mô hình RevidAPI được xác nhận trả về nhiều layer RGBA như Qwen Image Layered. Vì thế key RevidAPI không tự bật tách poster nhiều layer, làm nét ESRGAN hoặc chỉnh ảnh qua Qwen. Chức năng image-to-image của RevidAPI có tài liệu nhận URL ảnh tham chiếu nhưng chưa tích hợp upload/hosting ảnh cho chức năng đó trong app này; không gửi data URI tới endpoint không có xác nhận hỗ trợ. Xoá nền chỉ xuất một ảnh trong suốt, không phải bóc toàn bộ đối tượng thành nhiều layer.
+
+Khi cả hai khoá có mặt, tạo ảnh/xoá nền ưu tiên RevidAPI; các tác vụ còn lại dùng fal.ai. API readiness và nút xử lý được tính theo từng chức năng. Không có chuyển dịch vụ dự phòng có phí tự động. Tác vụ cũ đã ký vẫn được kiểm tra bằng khoá của đúng provider, không bị chuyển sang tài khoản khác.
+
+RevidAPI chưa có API huỷ được xác nhận trong tài liệu đã kiểm tra: nút huỷ bị khoá cho tác vụ này; tạm dừng theo dõi hoặc bỏ khỏi phiên không huỷ tác vụ ở nhà cung cấp. URL ảnh được giới hạn ở máy chủ ảnh RevidAPI có trong tài liệu; khoá không gửi theo request tải ảnh.
+
+Tài liệu: [Tạo ảnh RevidAPI](https://docs.revidapi.com/vi/ai_studio/ai_image_generate/), [Xoá nền RevidAPI](https://docs.revidapi.com/vi/endpoints/caption/remove_background/). Các endpoint được kiểm thử bằng mock; chưa xác thực khoá tài khoản hoặc gọi inference thật.
+
+### Kích hoạt fal.ai cho tách poster nhiều layer
+
 
 | Công cụ | Model |
 | --- | --- |
 | Tách poster thành 2–8 layer PNG/RGBA | `fal-ai/qwen-image-layered` |
-| Xoá nền người/sản phẩm | `fal-ai/ben/v2/image` |
+| Xoá nền người/sản phẩm | RevidAPI `u2net`; hoặc `fal-ai/ben/v2/image` nếu chỉ có fal.ai |
 | Làm nét, tăng độ phân giải 2× | `fal-ai/esrgan` (không bật phục dựng mặt) |
-| Tạo ảnh theo nội dung | `fal-ai/qwen-image` |
+| Tạo ảnh theo nội dung | RevidAPI `gpt-image-2`; hoặc `fal-ai/qwen-image` nếu chỉ có fal.ai |
 | Chỉnh ảnh theo mô tả, phối cảnh | `fal-ai/qwen-image-edit-2511` |
 
 1. Tạo tài khoản [fal.ai](https://fal.ai/), bổ sung số dư và lấy key tại [Dashboard → Keys](https://fal.ai/dashboard/keys). Dịch vụ tính phí theo tác vụ/model; kiểm tra mức phí và giới hạn tài khoản tại fal.ai trước khi dùng.
@@ -91,7 +110,7 @@ Tác vụ giữ trong sessionStorage dưới dạng mã được ký, không lư
 
 Ảnh đầu vào AI giảm xuống cạnh 1.536 px (2.048 px khi upscale), giữ alpha PNG; kết quả không khôi phục độ phân giải gốc bằng cách đặt lại vào khung lớn. Chất lượng cần kiểm tra trên poster thực tế, đặc biệt chữ tiếng Việt, logo, khuôn mặt và chi tiết nhỏ. AI là xử lý tạo sinh; không bảo đảm giữ mặt 100%. Chữ tách là ảnh raster, chưa có OCR/text có thể sửa; không khôi phục chính xác layer PSD/AI/CDR/Canva. Phối cảnh/file in không được hiệu chỉnh kỹ thuật tự động; chưa tạo đường cắt CNC/vector chuẩn.
 
-Ảnh dùng công cụ thủ công vẫn xử lý cục bộ. Khi chạy AI, ảnh được gửi đến fal.ai và kết quả nằm trên hệ thống của nhà cung cấp theo chính sách của họ. App tải kết quả về ảnh nhúng PNG để lưu dự án JSON. Chưa có R2/cloud project storage hoặc đồng bộ nhiều máy; dùng JSON để sao lưu.
+Ảnh dùng công cụ thủ công vẫn xử lý cục bộ. Khi chạy AI, ảnh được gửi đến dịch vụ của tác vụ (RevidAPI hoặc fal.ai) và kết quả nằm trên hệ thống của nhà cung cấp theo chính sách của họ. App tải kết quả về ảnh nhúng PNG để lưu dự án JSON. Chưa có R2/cloud project storage hoặc đồng bộ nhiều máy; dùng JSON để sao lưu.
 
 Backend chỉ cho các model đã định sẵn, xác thực mọi request có phí, kiểm tra Origin, giới hạn dung lượng, ký mã tác vụ/kết quả có hạn, chặn proxy URL tuỳ ý và không trả provider key cho client. Mã truy cập là quyền của chủ website; chưa có tài khoản người dùng, hạn mức riêng, Turnstile hay quản trị chi phí đa người dùng. Chỉ chia sẻ mã với người được phép sử dụng số dư fal.ai. API trả `no-store`; asset tĩnh vẫn đi trực tiếp qua Cloudflare.
 
@@ -116,6 +135,7 @@ Tài liệu chính thức: [Layered model](https://fal.ai/models/fal-ai/qwen-ima
 | `assets/styles.css` | Giao diện responsive |
 | `assets/ai.js` | Giao diện AI, theo dõi queue, xem trước và nhập layer |
 | `worker/index.mjs` | Backend AI và bảo vệ provider key |
+| `worker/revid.mjs` | Tích hợp tạo ảnh/xoá nền RevidAPI |
 | `assets/app.js` | Canvas/layer, xuất file, lưu dự án, tổng hợp video |
 | `scripts/serve.mjs` | Máy chủ phát triển cục bộ |
 | `scripts/build.mjs` | Build asset fingerprint vào `dist/` |

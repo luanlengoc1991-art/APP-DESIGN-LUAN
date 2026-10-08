@@ -1,3 +1,4 @@
+import { submitRevid, pollRevid, RevidError } from './revid.mjs';
 // Cloudflare Worker: fixed AI actions, private provider key, signed job capabilities.
 const MODELS = {
   layers: 'fal-ai/qwen-image-layered',
@@ -35,10 +36,14 @@ async function readJSON(request) {
   catch (e) { if (e instanceof ApiError) throw e; throw new ApiError(400, 'Dữ liệu JSON không hợp lệ.'); }
 }
 function requireReady(env) {
-  if (!env.FAL_KEY || !env.AI_ACCESS_TOKEN || env.AI_ACCESS_TOKEN.length < 16) {
+  if (!(env.FAL_KEY || env.REVID_API_KEY) || !env.AI_ACCESS_TOKEN || env.AI_ACCESS_TOKEN.length < 16) {
     throw new ApiError(503, 'AI chưa được kích hoạt. Chủ website cần cấu hình dịch vụ AI trong Cloudflare.');
   }
 }
+function actionProvider(action,env){if(env.REVID_API_KEY&&['generate','removeBackground'].includes(action))return 'revid';return env.FAL_KEY&&Object.hasOwn(MODELS,action)?'fal':null}
+function providerSecret(env,provider){const key=provider==='revid'?env.REVID_API_KEY:provider==='fal'?env.FAL_KEY:null;if(!key)throw new ApiError(503,'Dịch vụ của tác vụ này chưa được kích hoạt.');return key}
+async function verifyProviderToken(token,env,kind){if(typeof token!=='string'||token.length>12000)throw new ApiError(400,'Mã tác vụ không hợp lệ.');let payload;try{payload=JSON.parse(atob(token.split('.')[0]))}catch{throw new ApiError(400,'Mã tác vụ không hợp lệ.')};const source=payload.provider||'fal';return verify(token,providerSecret(env,source),kind)}
+async function imageResult(images,job,env){if(!Array.isArray(images)||!images.length||images.length>12)throw new ApiError(502,'Dịch vụ AI không trả về ảnh hợp lệ.');const source=job.provider||'fal';const files=await Promise.all(images.map(async(image,i)=>({name:job.action==='layers'?`AI · Layer ${i+1}`:`AI · ${job.action}`,token:await sign({kind:'image',provider:source,url:mediaURL(image.url,source),exp:Date.now()+2*3600000},providerSecret(env,source))})));return json({status:'COMPLETED',images:files})}
 async function authorized(request, env) {
   const actual = request.headers.get('authorization') || '';
   const expected = `Bearer ${env.AI_ACCESS_TOKEN}`;
@@ -73,10 +78,10 @@ function queueURL(value, requestId) {
   if (url.origin !== 'https://queue.fal.run' || url.username || url.password || !url.pathname.startsWith('/fal-ai/') || !url.pathname.includes(`/requests/${requestId}`)) throw new ApiError(502, 'Đường dẫn tác vụ AI không hợp lệ.');
   return url.href;
 }
-function mediaURL(value) {
+function mediaURL(value, source = 'fal') {
   let url; try { url = new URL(value); } catch { throw new ApiError(502, 'Đường dẫn ảnh AI không hợp lệ.'); }
-  const trusted = url.hostname === 'fal.media' || url.hostname.endsWith('.fal.media') ||
-    (url.hostname === 'storage.googleapis.com' && url.pathname.startsWith('/falserverless/'));
+  const trusted = source==='revid' ? (url.hostname==='edit.revidapi.com' && (url.pathname.startsWith('/media/')||url.pathname.startsWith('/output/'))) : (url.hostname === 'fal.media' || url.hostname.endsWith('.fal.media') ||
+    (url.hostname === 'storage.googleapis.com' && url.pathname.startsWith('/falserverless/')));
   if (!trusted || url.protocol !== 'https:' || url.port || url.username || url.password) throw new ApiError(502, 'Không chấp nhận máy chủ ảnh AI này.');
   return url.href;
 }
@@ -120,20 +125,23 @@ async function provider(url, env, options = {}) {
 }
 async function api(request, env) {
   const url = new URL(request.url); const route = url.pathname;
-  if (route === '/api/ai/config' && request.method === 'GET') return json({ ready: !!env.FAL_KEY && !!env.AI_ACCESS_TOKEN && env.AI_ACCESS_TOKEN.length >= 16, actions: Object.keys(MODELS) });
+  if (route === '/api/ai/config' && request.method === 'GET') {const providers=Object.fromEntries(Object.keys(MODELS).map(action=>[action,actionProvider(action,env)]));const actions=Object.keys(providers).filter(action=>providers[action]);return json({ready:!!actions.length&&!!env.AI_ACCESS_TOKEN&&env.AI_ACCESS_TOKEN.length>=16,actions,providers})}
   requireReady(env); await authorized(request, env);
   if (route === '/api/ai/auth' && request.method === 'POST') return json({ ok: true });
   if (route === '/api/ai/jobs' && request.method === 'POST') {
-    const body = await readJSON(request); const input = modelInput(body);
+    const body = await readJSON(request); const input = modelInput(body);const source=actionProvider(body.action,env);
+    if(!source)throw new ApiError(503,body.action==='layers'?'Tách poster nhiều layer cần FAL_KEY. Chưa xác nhận API nhiều layer trên RevidAPI.':'Tác vụ này chưa được kích hoạt.');
+    if(source==='revid'){const submitted=await submitRevid(body,env);if(submitted.immediate){if(!Array.isArray(submitted.immediate)||submitted.immediate.length>4)throw new ApiError(502,'RevidAPI trả dữ liệu ảnh không hợp lệ.');submitted.immediate=submitted.immediate.map(image=>({url:mediaURL(image.url,'revid')}))};const payload={...submitted,kind:'job',provider:'revid',action:body.action,exp:Date.now()+24*3600000};return json({token:await sign(payload,env.REVID_API_KEY),requestId:submitted.id,provider:'revid',cancelSupported:false},202)}
     const data = await provider(`https://queue.fal.run/${MODELS[body.action]}`, env, { method: 'POST', body: JSON.stringify(input) });
     if (!/^[a-zA-Z0-9-]{1,100}$/.test(data.request_id || '')) throw new ApiError(502, 'Dịch vụ không trả mã tác vụ.');
-    const payload = { kind: 'job', action: body.action, id: data.request_id,
+    const payload = { kind: 'job', provider: 'fal', action: body.action, id: data.request_id,
       status: queueURL(data.status_url, data.request_id), result: queueURL(data.response_url, data.request_id),
       cancel: queueURL(data.cancel_url, data.request_id), exp: Date.now() + 24 * 3600000 };
-    return json({ token: await sign(payload, env.FAL_KEY), requestId: data.request_id }, 202);
+    return json({ token: await sign(payload, env.FAL_KEY), requestId: data.request_id, provider:'fal', cancelSupported:true }, 202);
   }
   if (route === '/api/ai/job' && ['GET', 'DELETE'].includes(request.method)) {
-    const job = await verify(url.searchParams.get('token'), env.FAL_KEY, 'job');
+    const job = await verifyProviderToken(url.searchParams.get('token'), env, 'job');
+    if(job.provider==='revid'){if(request.method==='DELETE')throw new ApiError(409,'RevidAPI chưa có API huỷ được xác nhận. Tạm dừng theo dõi hoặc bỏ khỏi phiên không dừng tính phí.');const data=await pollRevid(job,env);return data.status==='COMPLETED'?imageResult(data.images,job,env):json({status:data.status})}
     if (request.method === 'DELETE') {
       await provider(queueURL(job.cancel, job.id), env, { method: 'PUT' });
       return json({ cancelled: true });
@@ -146,16 +154,12 @@ async function api(request, env) {
     }
     const result = await provider(queueURL(job.result, job.id), env);
     if (result.error || result.has_nsfw_concepts?.some(Boolean)) throw new ApiError(422, 'Dịch vụ AI không cung cấp kết quả cho ảnh này.');
-    const images = result.images || (result.image ? [result.image] : []);
-    if (!Array.isArray(images) || !images.length || images.length > 12) throw new ApiError(502, 'Dịch vụ AI không trả về layer ảnh hợp lệ.');
-    const files = await Promise.all(images.map(async (image, i) => ({ name: job.action === 'layers' ? `AI · Layer ${i + 1}` : `AI · ${job.action}`,
-      token: await sign({ kind: 'image', url: mediaURL(image.url), exp: Date.now() + 2 * 3600000 }, env.FAL_KEY) })));
-    return json({ status: 'COMPLETED', images: files });
+    return imageResult(result.images || (result.image ? [result.image] : []),job,env);
   }
   if (route === '/api/ai/image' && request.method === 'GET') {
-    const image = await verify(url.searchParams.get('token'), env.FAL_KEY, 'image');
+    const image = await verifyProviderToken(url.searchParams.get('token'), env, 'image');
     let response;
-    try { response = await fetch(mediaURL(image.url), { redirect: 'error', signal: AbortSignal.timeout(30000) }); }
+    try { response = await fetch(mediaURL(image.url,image.provider||'fal'), { redirect: 'error', signal: AbortSignal.timeout(30000) }); }
     catch { throw new ApiError(502, 'Không tải được ảnh kết quả.'); }
     if (!response.ok || !/^image\/(png|jpeg|webp)(;|$)/.test(response.headers.get('content-type') || '')) throw new ApiError(502, 'Ảnh kết quả không hợp lệ.');
     const bytes = await boundedBytes(response.body, 20 * 1024 * 1024);
@@ -167,6 +171,6 @@ export default {
   async fetch(request, env) {
     if (!new URL(request.url).pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
     try { return await api(request, env); }
-    catch (error) { return json({ error: error instanceof ApiError ? error.message : 'Có lỗi khi xử lý AI.' }, error instanceof ApiError ? error.status : 500); }
+    catch (error) { return json({ error: error instanceof ApiError || error instanceof RevidError ? error.message : 'Có lỗi khi xử lý AI.' }, error instanceof ApiError || error instanceof RevidError ? error.status : 500); }
   },
 };

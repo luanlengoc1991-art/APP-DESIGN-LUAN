@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "check": "node --check assets/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs && node --check assets/ai.js && node --check worker/index.mjs && node --test tests/*.test.mjs",
+    "check": "node --check assets/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs && node --check assets/ai.js && node --check worker/index.mjs && node --check worker/revid.mjs && node --test tests/*.test.mjs",
     "build": "node scripts/build.mjs",
     "deploy": "npm run check && npm run build && npx wrangler@4 deploy",
     "dev:ai": "npm run build && npx wrangler@4 dev"
