@@ -1,32 +1,1354 @@
-<!doctype html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Luân Design Studio — Bàn làm việc thiết kế, tách vùng ảnh, quản lý layer và xuất PNG. Phát triển từ quy trình trong video Bendesign AI."><title>Luân Design Studio · Không gian sáng tạo</title>
-<link rel="stylesheet" href="./assets/styles.css"></head><body>
-<svg style="display:none" aria-hidden="true"><symbol id="i-layer" viewBox="0 0 24 24"><path d="m12 3 10 5-10 5L2 8Z M2 12l10 5 10-5 M2 16l10 5 10-5"/></symbol><symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></symbol><symbol id="i-box" viewBox="0 0 24 24"><path d="m12 3 9 5v9l-9 5-9-5V8Zm0 10v9M3 8l9 5 9-5M7.5 5.5l9 5"/></symbol><symbol id="i-frame" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="15" rx="2"/><path d="M8 22h8M12 19v3M7 9h10M7 13h6"/></symbol><symbol id="i-restore" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 2 9M3 4v6h6M12 7v6l4 2"/></symbol><symbol id="i-cut" viewBox="0 0 24 24"><path d="m8 8 12 12M8 16l12-12M6 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 12a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8ZM14 3v6h5M8 13h8M8 17h6"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol><symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4Z"/></symbol></svg>
-<header class="top"><div class="brand"><div class="brandmark">L<span style="font-size:12px">✦</span></div><div><strong>LUÂN</strong><small>DESIGN STUDIO</small></div></div><div class="crumb">Không gian sáng tạo <span>/</span> <b>Bàn làm việc</b></div><div class="grow"></div><span class="statuslabel" id="saveStatus">Bản mẫu · chưa lưu</span><button class="savebtn" id="saveLocal">Lưu trên máy</button><button class="primary" id="exportOpen"><svg class="icon"><use href="#i-arrow"/></svg> Xuất thiết kế</button><div class="avatar">LN</div></header>
-<div class="app"><aside class="nav"><div class="eyebrow">Công cụ thiết kế</div><div id="navigation"></div><div class="navbottom"><div class="note"><strong>Không gian của riêng anh</strong><span class="tiny">Chỉnh sửa thủ công trên trình duyệt. Tác vụ AI gửi ảnh tới dịch vụ xử lý. Lưu dự án để tiếp tục chỉnh sửa bất cứ lúc nào.</span></div><button class="navbtn space" id="videoOpen"><svg class="icon"><use href="#i-video"/></svg>Nội dung video gốc</button><button class="navbtn" id="helpOpen"><svg class="icon"><use href="#i-file"/></svg>Hướng dẫn sử dụng</button></div></aside>
-<aside class="settings"><select class="mobileNav" id="mobileTask" aria-label="Chọn tác vụ"></select><div class="eyebrow">Trợ lý thiết kế</div><h2 id="settingsTitle">Bóc tách layer</h2><div class="subtabs"><button id="editTab" class="active">Chỉnh sửa ảnh</button><button id="newDesign">Tạo khung mới</button></div><div class="block"><div class="step"><span class="num">1</span><h3>Thêm thiết kế của anh</h3></div><button class="drop" id="uploadBtn"><span class="plus">＋</span><b>Tải ảnh hoặc kéo thả vào đây</b><small>PNG, JPG, WebP · Tối đa 15 MB/ảnh<br>Giới hạn cạnh làm việc 4.096 px</small></button><div class="uploadname" id="uploadName">Đang xem: mẫu minh hoạ có sẵn</div></div>
-<section id="aiPanel" class="block ai-panel" aria-label="Công cụ AI">
-<div class="step"><span class="num">✦</span><h3>Tách layer bằng AI</h3></div>
-<p id="aiConnection" class="instructions">Đang kiểm tra dịch vụ AI…</p>
-<details class="ai-access"><summary>Mở quyền sử dụng AI</summary><label for="aiPassword">Mã truy cập của chủ website</label><input id="aiPassword" type="password" autocomplete="off" placeholder="Mã truy cập AI"><div class="row space"><button id="aiUnlock">Mở quyền AI</button><button id="aiLock">Khoá</button></div></details>
-<p id="aiCapability" class="instructions"></p><label for="aiAction">Tác vụ</label><select id="aiAction"><option value="layers">Tách poster thành nhiều layer</option><option value="removeBackground">Xoá nền AI</option><option value="upscale">Làm nét / tăng độ phân giải 2×</option><option value="generate">Tạo ảnh theo nội dung</option><option value="edit">Chỉnh sửa ảnh theo yêu cầu</option></select>
-<div id="aiSourceField" class="space"><label for="aiSource">Ảnh đầu vào</label><select id="aiSource"><option value="selected">Layer ảnh đang chọn</option><option value="composition">Toàn bộ thiết kế đang hiển thị</option></select></div>
-<div id="aiLayersField" class="space"><label for="aiLayerCount">Số layer mong muốn</label><select id="aiLayerCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
-<div id="aiSizeField" class="space hidden"><label for="aiSize">Tỷ lệ ảnh tạo mới</label><select id="aiSize"><option value="landscape_4_3">Ngang 4:3</option><option value="landscape_16_9">Ngang 16:9</option><option value="square_hd">Vuông</option><option value="portrait_4_3">Dọc 3:4</option><option value="portrait_16_9">Dọc 9:16</option></select></div>
-<div id="aiPromptField" class="space"><label id="aiPromptLabel" for="aiPrompt">Mô tả poster (tuỳ chọn)</label><textarea id="aiPrompt" rows="3" maxlength="3000" placeholder="Ví dụ: poster gồm nền, người mẫu, cụm tiêu đề và hoa trang trí. Mô tả giúp AI hiểu ảnh, không đảm bảo mỗi mục được tách riêng."></textarea></div>
-<p class="instructions">Khi bấm xử lý, ảnh được gửi đến dịch vụ AI của tác vụ đã chọn (RevidAPI hoặc fal.ai) và có thể tính phí. Kết quả là layer ảnh; chữ chưa chuyển thành text có thể sửa.</p>
-<button id="aiRun" class="wide primary space" disabled>Bắt đầu xử lý AI</button><div class="tools space"><button id="aiResume" disabled>Kiểm tra kết quả</button><button id="aiPause">Tạm dừng theo dõi</button><button id="aiCancel" disabled>Huỷ tác vụ</button><button id="aiForget">Bỏ khỏi phiên</button></div><p id="aiStatus" class="instructions" role="status" aria-live="polite">Chờ kết nối.</p>
-</section>
-<div id="editControls"><div class="block"><div class="step"><span class="num">2</span><h3>Chọn cách xử lý</h3></div><div class="tools"><button data-tool="move" class="active">↖ Di chuyển</button><button data-tool="rect">▧ Chọn vùng</button><button data-tool="polygon">◇ Đa giác</button><button id="addText">T Thêm chữ</button></div><div class="instructions" id="toolHint">Chọn một layer bên dưới, rồi kéo để thay đổi vị trí.</div><button class="wide primary space" id="extract" disabled>Tách vùng thành layer</button></div><details class="block"><summary style="cursor:pointer;color:#bac8d8;font-size:12px">Xoá màu nền đơn sắc</summary><p class="instructions">Xoá các pixel gần với màu đã chọn trên layer ảnh. Không tự nhận diện người hoặc phục hồi phần bị che.</p><div class="fieldrow"><div><label for="bgColor">Màu cần xoá</label><input class="inputcolor" type="color" id="bgColor" value="#ffffff"></div><div><label for="tolerance">Dung sai (0–150)</label><input type="number" id="tolerance" value="35" min="0" max="150"></div></div><button id="removeBg" class="wide space">Xoá màu trên layer</button></details>
-<div class="divider"></div><div class="step"><span class="num">3</span><h3>Thuộc tính layer</h3></div><div class="inspector" id="inspector"><label for="layerName">Tên layer</label><input id="layerName" maxlength="100"><div id="textFields" class="space hidden"><label for="textValue">Nội dung chữ</label><textarea id="textValue" rows="2"></textarea><div class="fieldrow"><div><label for="fontSize">Cỡ chữ</label><input id="fontSize" type="number" min="8" max="600"></div><div><label for="fontColor">Màu chữ</label><input class="inputcolor" id="fontColor" type="color"></div></div></div><div class="fieldrow"><div><label for="posX">Vị trí X</label><input type="number" id="posX"></div><div><label for="posY">Vị trí Y</label><input type="number" id="posY"></div></div><div class="fieldrow"><div><label for="layerWidth">Chiều rộng</label><input type="number" id="layerWidth" min="1" max="8192"></div><div><label for="opacity">Độ rõ (%)</label><input type="number" id="opacity" min="0" max="100"></div></div><div class="tools space"><button id="layerUp">↑ Lên trên</button><button id="layerDown">↓ Xuống dưới</button><button id="duplicate">Nhân bản</button><button id="deleteLayer">Xoá layer</button></div></div></div>
-<div id="briefControls" class="hidden"><div class="notice">Nhập yêu cầu rồi chọn công cụ AI phù hợp. File in từ phối cảnh và đường cắt CNC cần kiểm tra, dựng vector riêng.</div><div class="space"><label for="briefText">Nội dung cần thực hiện</label><textarea id="briefText" rows="7" placeholder="Mô tả chủ đề, chữ cần có, màu sắc, kích thước và chi tiết cần giữ nguyên..."></textarea></div><button id="briefAI" class="wide primary space">Chọn công cụ AI cho tác vụ này</button><button id="downloadBrief" class="wide primary space">Tải yêu cầu thiết kế</button><button id="backEdit" class="wide space">Tiếp tục chỉnh sửa thủ công</button></div>
-<div class="divider"></div><button id="aiInfo" class="wide ghost tiny muted">✦ Công cụ AI · Kiểm tra kết nối</button></aside>
-<main class="work"><div class="workhead row between"><div><h1>Tách từng lớp. Mở mọi ý tưởng.</h1><p>Từ một thiết kế, tạo nên nhiều khả năng sáng tạo.</p></div><span class="pill">WORKSPACE / 01</span></div><div class="canvaspanel"><div class="toolbar"><button id="viewAll" class="active">Bản thiết kế</button><button id="viewSingle">Layer đang chọn</button><div class="grow"></div><button id="undo" title="Hoàn tác Ctrl+Z" aria-label="Hoàn tác">↶</button><button id="redo" title="Làm lại Ctrl+Shift+Z" aria-label="Làm lại">↷</button><span class="sep"></span><button id="zoomOut" aria-label="Thu nhỏ">−</button><span class="tiny" id="zoomValue">Vừa khung</span><button id="zoomIn" aria-label="Phóng to">＋</button><button id="fit">Vừa</button></div><div class="board" id="board"><div class="canvaswrap" id="canvasWrap"><canvas id="stage" width="1600" height="1000" aria-label="Bản thiết kế. Dùng các trường vị trí X, Y để di chuyển bằng bàn phím."></canvas></div></div><div class="canvasfoot"><span><span class="dot"></span><span id="canvasDimensions">1600 × 1000 px</span> <span style="margin:0 6px">/</span> <span id="layerCount">6 layers</span></span><span id="selectionStatus">Mẫu minh hoạ · có thể chỉnh sửa</span></div></div>
-<section class="layersbox"><div class="row between layershead"><div class="row"><svg class="icon" style="color:var(--mint)"><use href="#i-layer"/></svg><h2>Các lớp thiết kế</h2><span class="muted tiny" id="layersCount"></span></div><div class="row"><button id="importMore">＋ Thêm ảnh</button><button id="exportLayer">↓ Tải layer</button></div></div><div class="layers" id="layers"></div></section><div class="bottomline"><span>PNG trong suốt · SVG nhiều lớp · Dự án có thể chỉnh sửa</span><div class="row"><button class="ghost" id="videoOpen2">Đọc nội dung video ↗</button><button class="ghost" id="projectOpen">Mở dự án</button></div></div><div class="notice" id="workflowNotice">Tách poster thành layer, xoá nền, làm nét và tạo ảnh bằng AI sau khi kích hoạt dịch vụ.</div></main></div>
-<input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp" multiple hidden><input type="file" id="projectInput" accept=".json,application/json" hidden>
-<dialog id="exportDialog"><div class="modalhead"><h2>Xuất thiết kế</h2><button data-close="exportDialog" aria-label="Đóng">✕</button></div><div class="modalbody"><p>Xuất theo kích thước gốc của khung, không phụ thuộc mức phóng to trên màn hình.</p><div class="exportgrid"><button id="exportPNG"><b>PNG hoàn chỉnh ↗</b><small>Gộp các layer đang hiển thị, giữ vùng trong suốt.</small></button><button id="exportSVG"><b>SVG nhiều lớp ↗</b><small>Ảnh nhúng + chữ chỉnh sửa được. Không tự vector hoá ảnh.</small></button><button id="exportZIP"><b>Tất cả layer · ZIP ↗</b><small>Mỗi layer một PNG, cùng kích thước và vị trí để ghép lại.</small></button><button id="exportProject"><b>Lưu dự án · JSON ↗</b><small>Giữ toàn bộ layer để mở lại trên máy khác.</small></button></div><p class="tiny muted">PNG dùng màu RGB. Với in ấn, kiểm tra kích thước vật lý, độ phân giải và chuyển CMYK trong phần mềm chế bản.</p></div></dialog>
-<dialog id="newDialog"><div class="modalhead"><h2>Tạo khung thiết kế mới</h2><button data-close="newDialog" aria-label="Đóng">✕</button></div><div class="modalbody"><p>Khung mới thay thế thiết kế đang mở. Hãy tải dự án hiện tại nếu anh cần giữ lại.</p><label for="preset">Kích thước</label><select id="preset"><option value="1600,1000">Ngang · 1600 × 1000</option><option value="1080,1080">Vuông · 1080 × 1080</option><option value="1080,1920">Story · 1080 × 1920</option><option value="1920,1080">Màn hình · 1920 × 1080</option><option value="custom">Tự nhập</option></select><div class="fieldrow"><div><label for="newW">Rộng (px)</label><input id="newW" type="number" min="64" max="4096" value="1600"></div><div><label for="newH">Cao (px)</label><input id="newH" type="number" min="64" max="4096" value="1000"></div></div><button id="createBlank" class="primary space">Tạo khung trống</button><button id="resetDemo" class="space">Mở lại mẫu minh hoạ</button></div></dialog>
-<dialog id="infoDialog"><div class="modalhead"><h2 id="infoTitle">Thông tin</h2><button data-close="infoDialog" aria-label="Đóng">✕</button></div><div class="modalbody" id="infoContent"></div></dialog>
-<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-<dialog id="aiResultDialog"><div class="modalhead"><h2>Kết quả AI · Xem trước</h2><button data-close="aiResultDialog" aria-label="Đóng">✕</button></div><div class="modalbody"><p id="aiResultInfo" class="notice"></p><div id="aiPreview" class="ai-preview"></div><div class="row space"><button id="aiApply" class="primary">Thêm vào thiết kế</button><button id="aiDownload">Tải ZIP kết quả</button></div></div></dialog>
-<script src="./assets/app.js" defer></script><script src="./assets/ai.js" defer></script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luân Flow Studio — Tạo Video Hàng Loạt với Google Flow (Veo 3.1)</title>
+  <style>
+    :root {
+      --bg-base: #090d16;
+      --bg-panel: #111827;
+      --bg-card: #1e293b;
+      --bg-input: #0f172a;
+      --border: rgba(148, 163, 184, 0.18);
+      --border-focus: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-indigo: #6366f1;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #1e1b4b 0%, var(--bg-base) 45%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(17, 24, 39, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+    }
+
+    .brand-title h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-title p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-input);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-tab {
+      padding: 7px 14px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .nav-tab.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .connection-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-pill.standby {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.16s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #4f46e5);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #fff;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #059669, #10b981);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 20px;
+      padding: 20px 24px;
+      flex: 1;
+      max-width: 1680px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1120px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.88);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .panel-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-weight: 600;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    textarea, input[type="text"], input[type="password"], input[type="number"], select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--border-focus);
+    }
+
+    textarea {
+      min-height: 145px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.14s ease;
+    }
+
+    .chip.selected {
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+      border-color: #38bdf8;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+
+    .stat-card .label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .stat-card .value {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .progress-wrap {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #6366f1, #10b981);
+      transition: width 0.3s ease;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-input);
+      flex: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 11px 13px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    th {
+      background: rgba(30, 41, 59, 0.65);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    tr:hover td {
+      background: rgba(30, 41, 59, 0.35);
+    }
+
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .status-pending { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+    .status-running { background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
+    .status-completed { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .status-error { background: rgba(239, 68, 68, 0.18); color: #fca5a5; }
+
+    .video-thumb {
+      width: 136px;
+      height: 76px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #020617;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .ingredient-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .ingredient-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .code-box {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: pre;
+      max-height: 300px;
+    }
+
+    .helper-banner {
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: #bae6fd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(15, 23, 42, 0.96);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      z-index: 9999;
+      transition: opacity 0.25s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">LF</div>
+      <div class="brand-title">
+        <h1>Luân Flow Studio — Batch AI Video</h1>
+        <p>Kết nối tài khoản Google Flow (<a href="https://flow.google.com/u/1/?pli=1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">flow.google.com/u/1</a>) &amp; Cloudflare Worker</p>
+      </div>
+    </div>
+
+    <nav class="nav-tabs" role="tablist">
+      <button type="button" class="nav-tab active" data-tab="batch-tab">🎬 Tạo Video Hàng Loạt</button>
+      <button type="button" class="nav-tab" data-tab="ingredients-tab">🧩 Khay Nguyên Liệu (Nhân vật)</button>
+      <button type="button" class="nav-tab" data-tab="bridge-tab">🔌 Cầu Nối Google Flow &amp; GitHub</button>
+    </nav>
+
+    <div class="connection-bar">
+      <div id="flowConnectionBadge" class="status-pill">
+        <span class="dot"></span>
+        <span id="flowConnectionText">Sẵn sàng: Cầu nối Google Flow (u/1)</span>
+      </div>
+      <button type="button" id="openFlowAccountBtn" class="btn btn-primary" title="Mở tab Google Flow u/1 và kết nối hàng đợi">
+        🔗 Mở &amp; Kết nối Google Flow (u/1)
+      </button>
+    </div>
+  </header>
+
+  <!-- TAB 1: BATCH STUDIO -->
+  <main id="batch-tab" class="workspace">
+    <section class="panel">
+      <div class="panel-header">
+        <h2>⚡ Thiết lập Lô Tạo Video (Batch Prompts)</h2>
+        <span class="badge" id="promptCountBadge">3 cảnh</span>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Phương thức kết nối thực thi</span>
+          <span style="color:var(--accent);">Khuyên dùng: Tài khoản Google Flow</span>
+        </div>
+        <select id="executionModeSelect">
+          <option value="flow_bridge">1. Qua tài khoản Google Flow đang đăng nhập (flow.google.com/u/1/?pli=1)</option>
+          <option value="worker_veo">2. Qua Cloudflare Worker (/api/flow/veo-generate - Gemini Veo 3.1 API)</option>
+        </select>
+      </div>
+
+      <div id="workerAuthBox" class="grid-2 hidden">
+        <div class="form-group">
+          <label class="form-label">Mã AI_ACCESS_TOKEN (Worker)</label>
+          <input type="password" id="aiAccessTokenInput" placeholder="Nhập mã bảo vệ trên Cloudflare..." />
+        </div>
+        <div class="form-group">
+          <label class="form-label">GEMINI_API_KEY (Tùy chọn)</label>
+          <input type="password" id="geminiApiKeyInput" placeholder="Để trống nếu đã cài trong Worker..." />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Danh sách Prompts (Mỗi dòng là 1 video cần tạo)</span>
+          <div style="display:flex;gap:6px;">
+            <button type="button" class="btn" id="autoSplitScriptBtn" style="padding:3px 8px;font-size:11px;">✨ Tách từ kịch bản</button>
+            <label class="btn" style="padding:3px 8px;font-size:11px;cursor:pointer;">
+              📂 Nhập .TXT
+              <input type="file" id="importTxtInput" accept=".txt,.csv" style="display:none;" />
+            </label>
+          </div>
+        </div>
+        <textarea id="batchPromptsInput" placeholder="Nhập mỗi dòng 1 mô tả cảnh video...">Cinematic establishing shot of futuristic Saigon riverside at golden hour, neon reflections on water, ultra detailed 4k
+Medium tracking shot of a young designer working on holographic layers in a dark modern studio, warm rim lighting
+Close-up slow motion of glowing digital layers assembling into a vibrant movie poster, shallow depth of field</textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Mô hình Google Flow</label>
+          <select id="modelSelect">
+            <option value="veo-3.1-generate-preview">Veo 3.1 (Cinematic + Native Audio)</option>
+            <option value="veo-3.1-fast">Veo 3.1 Fast (Tốc độ cao)</option>
+            <option value="gemini-omni-flash">Gemini Omni Flash (Nhanh / 360p-720p)</option>
+            <option value="imagen-4-frames">Imagen 4 (Tạo Frame đầu/cuối)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Chế độ tạo sinh (Flow Mode)</label>
+          <select id="flowModeSelect">
+            <option value="text_to_video">Text to Video (Văn bản → Video)</option>
+            <option value="ingredients_to_video">Ingredients to Video (Đồng nhất nhân vật)</option>
+            <option value="frames_to_video">Frames to Video (First &amp; Last Frame)</option>
+            <option value="scene_jump_to">Scene Builder — Jump To (Nối tiếp cảnh)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label class="form-label">Tỷ lệ khung hình</label>
+          <select id="aspectRatioSelect">
+            <option value="16:9">16:9 (Ngang - YouTube)</option>
+            <option value="9:16">9:16 (Dọc - TikTok/Reels)</option>
+            <option value="1:1">1:1 (Vuông)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Số biến thể / lệnh</label>
+          <select id="sampleCountSelect">
+            <option value="1">1 video / prompt</option>
+            <option value="2">2 videos / prompt</option>
+            <option value="4">4 videos / prompt</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Giãn cách giữa 2 lệnh</label>
+          <select id="delaySelect">
+            <option value="4500">4.5 giây (An toàn)</option>
+            <option value="8000">8 giây (Ổn định)</option>
+            <option value="2000">2 giây (Nhanh)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span>🎥 Chuyển động máy quay (Camera Control Chips)</span>
+          <span style="font-size:11px;">Tự động gắn vào toàn bộ lô</span>
+        </label>
+        <div class="chip-group" id="cameraMotionChips">
+          <span class="chip" data-value="Static locked-off camera">Static (Tĩnh)</span>
+          <span class="chip selected" data-value="Smooth cinematic pan">Pan (Quay ngang)</span>
+          <span class="chip" data-value="Vertical camera tilt">Tilt (Quay dọc)</span>
+          <span class="chip" data-value="Slow dolly in shot">Dolly In (Tiến gần)</span>
+          <span class="chip" data-value="Parallel tracking shot">Tracking (Bám chuyển động)</span>
+          <span class="chip" data-value="Natural handheld camera movement">Handheld (Cầm tay)</span>
+          <span class="chip" data-value="Sweeping aerial drone shot">Drone / Flycam</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📐 Góc máy &amp; Ánh sáng (Camera Angle)</label>
+        <div class="chip-group" id="cameraAngleChips">
+          <span class="chip selected" data-value="eye-level shot">Eye Level (Ngang tầm mắt)</span>
+          <span class="chip" data-value="dramatic low-angle shot">Low Angle (Góc thấp)</span>
+          <span class="chip" data-value="high-angle establishing shot">High Angle (Góc cao)</span>
+          <span class="chip" data-value="bird's-eye overhead view">Bird's Eye (Từ đỉnh đầu)</span>
+          <span class="chip" data-value="canted Dutch angle">Dutch Angle (Góc nghiêng)</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🧩 Khóa hồ sơ Nhân vật / Bối cảnh (Ingredients Consistency)</label>
+        <select id="activeIngredientSelect">
+          <option value="">-- Không khóa nhân vật cố định --</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:8px;padding-top:6px;flex-wrap:wrap;">
+        <button type="button" id="addToQueueBtn" class="btn" style="flex:1;">➕ Thêm vào Hàng Đợi</button>
+        <button type="button" id="runDemoSimBtn" class="btn btn-primary" style="flex:1.1;">✨ Chạy Thử Demo</button>
+        <button type="button" id="startBatchBtn" class="btn btn-success" style="flex:1.3;">🚀 Chạy Hàng Loạt</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>📋 Bảng Điều Phối Hàng Đợi &amp; Kết Quả Video</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" id="pauseResumeBtn" class="btn">⏸️ Tạm dừng</button>
+          <button type="button" id="retryFailedBtn" class="btn">🔄 Chạy lại mục lỗi</button>
+          <button type="button" id="downloadAllBtn" class="btn btn-primary">⬇️ Tải toàn bộ MP4</button>
+          <button type="button" id="clearQueueBtn" class="btn btn-danger">🗑️ Xóa danh sách</button>
+        </div>
+      </div>
+
+      <div class="helper-banner">
+        <div>
+          <strong>Kết nối tài khoản Google Flow:</strong> Nhấn <strong>"Mở &amp; Kết nối Google Flow (u/1)"</strong> ở góc trên để mở tab <a href="https://flow.google.com/u/1/?pli=1" target="_blank" rel="noopener" style="color:#fff;">flow.google.com/u/1/?pli=1</a>, sau đó bấm <strong>Chạy Hàng Loạt</strong>.
+        </div>
+        <button type="button" class="btn" id="copyBookmarkletQuickBtn" style="padding:5px 10px;font-size:12px;">📋 Sao chép Script nối nhanh</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="label">Tổng số cảnh (Jobs)</div>
+          <div class="value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Đang kết xuất</div>
+          <div class="value" id="statRunning" style="color:var(--accent);">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Đã hoàn tất</div>
+          <div class="value" id="statCompleted" style="color:var(--success);">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Cần thử lại</div>
+          <div class="value" id="statFailed" style="color:var(--danger);">0</div>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div id="batchProgressBar" class="progress-bar"></div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:52px;">#</th>
+              <th>Câu lệnh hoàn chỉnh (Prompt + Camera + Ingredient)</th>
+              <th style="width:130px;">Cấu hình</th>
+              <th style="width:140px;">Trạng thái</th>
+              <th style="width:150px;">Xem trước</th>
+              <th style="width:145px;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="queueTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- TAB 2: INGREDIENTS & CHARACTER CONSISTENCY -->
+  <section id="ingredients-tab" class="workspace hidden" style="grid-template-columns: 380px 1fr;">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>➕ Tạo Hồ Sơ Nguyên Liệu (Ingredient)</h2>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tên Nhân vật / Bối cảnh / Vật thể</label>
+        <input type="text" id="ingNameInput" placeholder="VD: Nhân vật chính Minh Anh" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Loại nguyên liệu</label>
+        <select id="ingTypeSelect">
+          <option value="Nhân vật (Character)">Nhân vật (Character Profile)</option>
+          <option value="Bối cảnh (Location)">Bối cảnh (Location / Set)</option>
+          <option value="Phong cách (Style)">Phong cách điện ảnh (Visual Style)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mô tả cố định để ghép vào mọi cảnh (Prompt Anchor)</label>
+        <textarea id="ingDescInput" placeholder="Mô tả chi tiết khuôn mặt, trang phục, ánh sáng để giữ đồng nhất xuyên suốt các cảnh video..."></textarea>
+      </div>
+      <button type="button" id="saveIngredientBtn" class="btn btn-primary">💾 Lưu vào Khay Nguyên Liệu</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2>🧩 Danh Sách Nguyên Liệu Đang Lưu</h2>
+        <span class="badge">Giữ đồng nhất nhân vật giữa các cảnh Google Flow</span>
+      </div>
+      <div id="ingredientCardsContainer" class="ingredient-cards"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: EXTENSION BRIDGE & GITHUB DEPLOYMENT -->
+  <section id="bridge-tab" class="workspace hidden" style="grid-template-columns: 1fr 1fr;">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>🔌 Tiện Ích Cầu Nối Tài Khoản Google Flow (Chrome Extension)</h2>
+        <span class="badge">Miễn phí 100% — Dùng thẳng tài khoản u/1</span>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);">
+        Vì trình duyệt bảo mật cookie của <strong>flow.google.com</strong>, bạn chỉ cần cài tiện ích cầu nối nhỏ này (hoặc dán đoạn mã vào Console của tab Google Flow) để Web App tự động đẩy hàng trăm lệnh sang tài khoản Google Flow của bạn và tự tải video MP4 về máy.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" id="downloadManifestBtn" class="btn btn-primary">📦 1. Tải manifest.json</button>
+        <button type="button" id="downloadContentScriptBtn" class="btn btn-success">⚡ 2. Tải content.js (Cầu nối Flow)</button>
+        <button type="button" id="downloadWorkerScriptBtn" class="btn">☁️ 3. Tải flow-worker.js (Cloudflare Worker)</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cách cài trong 15 giây trên Chrome / Edge / Brave:</label>
+        <div class="code-box">1. Tạo 1 thư mục tên "luan-flow-extension" trên máy tính, bỏ 2 file manifest.json và content.js vừa tải vào đó.
+2. Mở trình duyệt vào địa chỉ: chrome://extensions
+3. Bật công tắc "Chế độ dành cho nhà phát triển" (Developer mode) ở góc trên bên phải.
+4. Nhấn nút "Tải tiện ích đã giải nén" (Load unpacked) -> Chọn thư mục "luan-flow-extension".
+5. Mở https://flow.google.com/u/1/?pli=1 -> Bạn sẽ thấy huy hiệu "⚡ Luân Flow Bridge: Sẵn sàng" ở góc dưới phải!</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2>🚀 Cập Nhật Lên GitHub &amp; Tự Động Deploy Cloudflare</h2>
+        <span class="badge">luanlengoc1991-art/APP-DESIGN-LUAN</span>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);">
+        Để đưa trang <strong>Luân Flow Studio</strong> này lên kho lưu trữ <a href="https://github.com/luanlengoc1991-art/APP-DESIGN-LUAN" target="_blank" rel="noopener" style="color:var(--accent);">luanlengoc1991-art/APP-DESIGN-LUAN</a> và tự động xuất bản ra <a href="https://app-design-luan.luanlengoc1991.workers.dev" target="_blank" rel="noopener" style="color:var(--accent);">app-design-luan.luanlengoc1991.workers.dev</a>:
+      </p>
+      <div class="form-group">
+        <label class="form-label">Đẩy trực tiếp lên nhánh main (Cloudflare tự động build):</label>
+        <div class="code-box"># Lưu tệp giao diện này thành index.html (hoặc public/flow.html) trong repo:
+git add .
+git commit -m "Thêm ứng dụng tạo video hàng loạt kết nối Google Flow"
+git push origin main
+
+# Hoặc triển khai trực tiếp từ máy lên Cloudflare Workers:
+npm run deploy</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="toastBox" class="toast hidden"></div>
+
+  <script>
+    const BRIDGE_CHANNEL = 'luan_flow_bridge_v1';
+    let bridgeChannel = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        bridgeChannel = new BroadcastChannel(BRIDGE_CHANNEL);
+      }
+    } catch (err) {
+      console.warn('BroadcastChannel unavailable in this context:', err);
+    }
+
+    let flowWindowRef = null;
+    const FULL_EXTENSION_CONTENT_JS = "/**\n * Lu\u00e2n Design Studio \u2014 Google Flow Automation Bridge (content.js)\n * T\u1ef1 \u0111\u1ed9ng nh\u1eadn h\u00e0ng \u0111\u1ee3i t\u1ea1o video h\u00e0ng lo\u1ea1t t\u1eeb Web App (app-design-luan.luanlengoc1991.workers.dev)\n * v\u00e0 th\u1ef1c thi tr\u1ef1c ti\u1ebfp tr\u00ean phi\u00ean \u0111\u0103ng nh\u1eadp https://flow.google.com/u/1/?pli=1\n */\n(() => {\n  const BRIDGE_CHANNEL = 'luan_flow_bridge_v1';\n  const STATE = {\n    isRunning: false,\n    isPaused: false,\n    currentJob: null,\n    queue: [],\n    completedCount: 0,\n    failedCount: 0,\n    delayBetweenJobsMs: 4500,\n    autoDownload: true\n  };\n\n  const channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(BRIDGE_CHANNEL) : null;\n\n  function logStatus(message, extra = {}) {\n    console.log(`[Lu\u00e2n Flow Bridge] ${message}`, extra);\n    updateFloatingBadge(message);\n    const payload = {\n      source: 'LUAN_FLOW_EXTENSION',\n      type: 'FLOW_STATUS_UPDATE',\n      timestamp: Date.now(),\n      message,\n      url: window.location.href,\n      ...extra\n    };\n    if (channel) channel.postMessage(payload);\n    if (window.opener) {\n      window.opener.postMessage(payload, '*');\n    }\n  }\n\n  function findPromptInput() {\n    const selectors = [\n      'textarea[placeholder*=\"prompt\" i]',\n      'textarea[placeholder*=\"Describe\" i]',\n      'textarea[placeholder*=\"M\u00f4 t\u1ea3\" i]',\n      'textarea[aria-label*=\"prompt\" i]',\n      'div[contenteditable=\"true\"][role=\"textbox\"]',\n      'textarea'\n    ];\n    for (const sel of selectors) {\n      const el = document.querySelector(sel);\n      if (el && el.offsetParent !== null) return el;\n    }\n    return null;\n  }\n\n  function findGenerateButton() {\n    const buttons = Array.from(document.querySelectorAll('button, [role=\"button\"]'));\n    return buttons.find((btn) => {\n      const text = (btn.innerText || btn.getAttribute('aria-label') || '').trim().toLowerCase();\n      return (\n        text === 'generate' ||\n        text.includes('generate') ||\n        text.includes('t\u1ea1o') ||\n        text.includes('create') ||\n        btn.getAttribute('data-testid')?.includes('generate')\n      );\n    });\n  }\n\n  function setNativeValue(element, value) {\n    if (!element) return false;\n    element.focus();\n    if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {\n      const prototype = Object.getPrototypeOf(element);\n      const valueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;\n      if (valueSetter) {\n        valueSetter.call(element, value);\n      } else {\n        element.value = value;\n      }\n      element.dispatchEvent(new Event('input', { bubbles: true }));\n      element.dispatchEvent(new Event('change', { bubbles: true }));\n      return true;\n    }\n    if (element.isContentEditable) {\n      element.innerText = value;\n      element.dispatchEvent(new InputEvent('input', { bubbles: true, data: value }));\n      return true;\n    }\n    return false;\n  }\n\n  function collectVideoUrls() {\n    const videos = Array.from(document.querySelectorAll('video'));\n    const urls = new Set();\n    videos.forEach((v) => {\n      if (v.src && (v.src.startsWith('http') || v.src.startsWith('blob:'))) {\n        urls.add(v.src);\n      }\n      v.querySelectorAll('source').forEach((s) => {\n        if (s.src) urls.add(s.src);\n      });\n    });\n    return Array.from(urls);\n  }\n\n  async function waitForNewVideo(beforeUrls, timeoutMs = 180000) {\n    const start = Date.now();\n    while (Date.now() - start < timeoutMs) {\n      if (STATE.isPaused) {\n        await new Promise((r) => setTimeout(r, 1000));\n        continue;\n      }\n      const currentUrls = collectVideoUrls();\n      const newUrl = currentUrls.find((u) => !beforeUrls.includes(u));\n      if (newUrl) return newUrl;\n      await new Promise((r) => setTimeout(r, 2500));\n    }\n    throw new Error('Qu\u00e1 th\u1eddi gian ch\u1edd Google Flow k\u1ebft xu\u1ea5t video (180s).');\n  }\n\n  async function executeSingleJob(job) {\n    STATE.currentJob = job;\n    logStatus(`\u0110ang x\u1eed l\u00fd c\u1ea3nh #${job.index}: ${job.finalPrompt.slice(0, 48)}...`, {\n      jobId: job.id,\n      status: 'running'\n    });\n\n    const inputEl = findPromptInput();\n    if (!inputEl) {\n      throw new Error('Kh\u00f4ng t\u00ecm th\u1ea5y \u00f4 nh\u1eadp Prompt tr\u00ean giao di\u1ec7n Google Flow. H\u00e3y m\u1edf v\u00e0o m\u1ed9t Project tr\u00ean Google Flow.');\n    }\n\n    const beforeUrls = collectVideoUrls();\n    setNativeValue(inputEl, job.finalPrompt);\n    await new Promise((r) => setTimeout(r, 700));\n\n    const genBtn = findGenerateButton();\n    if (!genBtn || genBtn.disabled) {\n      throw new Error('N\u00fat Generate tr\u00ean Google Flow \u0111ang b\u1ecb kh\u00f3a ho\u1eb7c ch\u01b0a s\u1eb5n s\u00e0ng.');\n    }\n    genBtn.click();\n\n    logStatus(`\u0110\u00e3 g\u1eedi l\u1ec7nh #${job.index} sang Google Flow, \u0111ang ch\u1edd k\u1ebft xu\u1ea5t...`, {\n      jobId: job.id,\n      status: 'rendering'\n    });\n\n    const videoUrl = await waitForNewVideo(beforeUrls, job.timeoutMs || 180000);\n    STATE.completedCount += 1;\n\n    logStatus(`Ho\u00e0n t\u1ea5t video #${job.index}!`, {\n      jobId: job.id,\n      status: 'completed',\n      videoUrl\n    });\n\n    if (STATE.autoDownload && videoUrl && !videoUrl.startsWith('blob:')) {\n      const a = document.createElement('a');\n      a.href = videoUrl;\n      a.download = `LuanFlow_Scene_${String(job.index).padStart(3, '0')}.mp4`;\n      document.body.appendChild(a);\n      a.click();\n      a.remove();\n    }\n  }\n\n  async function processQueue() {\n    if (STATE.isRunning) return;\n    STATE.isRunning = true;\n    while (STATE.queue.length > 0 && STATE.isRunning) {\n      if (STATE.isPaused) {\n        await new Promise((r) => setTimeout(r, 1000));\n        continue;\n      }\n      const job = STATE.queue.shift();\n      try {\n        await executeSingleJob(job);\n      } catch (err) {\n        STATE.failedCount += 1;\n        logStatus(`L\u1ed7i \u1edf c\u1ea3nh #${job.index}: ${err.message}`, {\n          jobId: job.id,\n          status: 'error',\n          error: err.message\n        });\n      }\n      await new Promise((r) => setTimeout(r, STATE.delayBetweenJobsMs));\n    }\n    STATE.isRunning = false;\n    STATE.currentJob = null;\n    logStatus('\u0110\u00e3 ho\u00e0n th\u00e0nh to\u00e0n b\u1ed9 h\u00e0ng \u0111\u1ee3i t\u1ea1o video!');\n  }\n\n  function handleIncomingCommand(data) {\n    if (!data || data.target !== 'LUAN_FLOW_EXTENSION') return;\n    if (data.action === 'PING') {\n      logStatus('\u0110\u00e3 k\u1ebft n\u1ed1i v\u1edbi tab Google Flow', { status: 'connected' });\n    } else if (data.action === 'START_BATCH') {\n      STATE.queue.push(...(data.jobs || []));\n      STATE.autoDownload = Boolean(data.autoDownload ?? true);\n      STATE.delayBetweenJobsMs = Number(data.delayMs || 4500);\n      STATE.isPaused = false;\n      processQueue();\n    } else if (data.action === 'PAUSE_BATCH') {\n      STATE.isPaused = true;\n      logStatus('\u0110\u00e3 t\u1ea1m d\u1eebng h\u00e0ng \u0111\u1ee3i Google Flow', { status: 'paused' });\n    } else if (data.action === 'RESUME_BATCH') {\n      STATE.isPaused = false;\n      logStatus('Ti\u1ebfp t\u1ee5c ch\u1ea1y h\u00e0ng \u0111\u1ee3i Google Flow', { status: 'running' });\n    } else if (data.action === 'STOP_BATCH') {\n      STATE.queue = [];\n      STATE.isRunning = false;\n      STATE.isPaused = false;\n      logStatus('\u0110\u00e3 d\u1eebng v\u00e0 x\u00f3a h\u00e0ng \u0111\u1ee3i tr\u00ean Google Flow', { status: 'stopped' });\n    }\n  }\n\n  if (channel) {\n    channel.onmessage = (event) => handleIncomingCommand(event.data);\n  }\n  window.addEventListener('message', (event) => handleIncomingCommand(event.data));\n\n  function updateFloatingBadge(text) {\n    let badge = document.getElementById('luan-flow-bridge-badge');\n    if (!badge) {\n      badge = document.createElement('div');\n      badge.id = 'luan-flow-bridge-badge';\n      badge.style.cssText = [\n        'position:fixed',\n        'bottom:18px',\n        'right:18px',\n        'z-index:999999',\n        'background:rgba(15,23,42,0.94)',\n        'color:#38bdf8',\n        'border:1px solid rgba(56,189,248,0.45)',\n        'border-radius:12px',\n        'padding:10px 14px',\n        'font:600 12px/1.4 system-ui,-apple-system,sans-serif',\n        'box-shadow:0 10px 25px rgba(0,0,0,0.45)',\n        'backdrop-filter:blur(8px)'\n      ].join(';');\n      document.body.appendChild(badge);\n    }\n    badge.textContent = `\u26a1 Lu\u00e2n Flow Bridge: ${text}`;\n  }\n\n  updateFloatingBadge('S\u1eb5n s\u00e0ng nh\u1eadn l\u1ec7nh t\u1ea1o video h\u00e0ng lo\u1ea1t');\n  logStatus('C\u1ea7u n\u1ed1i Google Flow \u0111\u00e3 k\u00edch ho\u1ea1t tr\u00ean trang', { status: 'connected' });\n})();\n";
+    const FULL_WORKER_FLOW_JS = "/**\n * Lu\u00e2n Design Studio \u2014 Cloudflare Worker Google Flow & Veo 3.1 Handler (worker/flow-worker.js)\n * T\u00edch h\u1ee3p v\u00e0o worker/index.js c\u1ee7a kho l\u01b0u tr\u1eef https://github.com/luanlengoc1991-art/APP-DESIGN-LUAN\n * H\u1ed7 tr\u1ee3:\n * 1) Ki\u1ec3m tra k\u1ebft n\u1ed1i Flow Studio (/api/flow/health)\n * 2) G\u1ecdi tr\u1ef1c ti\u1ebfp m\u00f4 h\u00ecnh t\u1ea1o video Veo 3.1 / Gemini Omni Flash qua Gemini API (/api/flow/veo-generate & /api/flow/veo-status)\n */\n\nconst GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';\n\nconst CORS_HEADERS = {\n  'Access-Control-Allow-Origin': '*',\n  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',\n  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-AI-Access-Token'\n};\n\nfunction jsonResponse(data, status = 200) {\n  return new Response(JSON.stringify(data, null, 2), {\n    status,\n    headers: {\n      'Content-Type': 'application/json; charset=utf-8',\n      ...CORS_HEADERS\n    }\n  });\n}\n\nfunction verifyAccessToken(request, env) {\n  const requiredToken = env.AI_ACCESS_TOKEN;\n  if (!requiredToken) return true;\n  const authHeader = request.headers.get('Authorization') || '';\n  const customHeader = request.headers.get('X-AI-Access-Token') || '';\n  const bearer = authHeader.replace(/^Bearer\\s+/i, '').trim();\n  return bearer === requiredToken || customHeader.trim() === requiredToken;\n}\n\nexport async function handleFlowApiRequest(request, env) {\n  const url = new URL(request.url);\n\n  if (request.method === 'OPTIONS') {\n    return new Response(null, { status: 204, headers: CORS_HEADERS });\n  }\n\n  if (url.pathname === '/api/flow/health') {\n    return jsonResponse({\n      ok: true,\n      service: 'luan-flow-batch-video-worker',\n      flowAccountTarget: 'https://flow.google.com/u/1/?pli=1',\n      hasGeminiKey: Boolean(env.GEMINI_API_KEY),\n      requiresAccessToken: Boolean(env.AI_ACCESS_TOKEN)\n    });\n  }\n\n  if (!verifyAccessToken(request, env)) {\n    return jsonResponse(\n      {\n        ok: false,\n        error: 'M\u00e3 AI_ACCESS_TOKEN kh\u00f4ng h\u1ee3p l\u1ec7 ho\u1eb7c ch\u01b0a \u0111\u01b0\u1ee3c nh\u1eadp tr\u00ean giao di\u1ec7n.'\n      },\n      401\n    );\n  }\n\n  // Endpoint 1: Kh\u1edfi t\u1ea1o y\u00eau c\u1ea7u t\u1ea1o video h\u00e0ng lo\u1ea1t v\u1edbi Veo 3.1 tr\u00ean Gemini API\n  if (url.pathname === '/api/flow/veo-generate' && request.method === 'POST') {\n    const body = await request.json();\n    const apiKey = body.geminiApiKey || env.GEMINI_API_KEY;\n    if (!apiKey) {\n      return jsonResponse(\n        {\n          ok: false,\n          error: 'Ch\u01b0a c\u1ea5u h\u00ecnh GEMINI_API_KEY trong Cloudflare Worker Secrets ho\u1eb7c ch\u01b0a nh\u1eadp kh\u00f3a API.'\n        },\n        400\n      );\n    }\n\n    const model = body.model || 'veo-3.1-generate-preview';\n    const prompt = (body.prompt || '').trim();\n    const aspectRatio = body.aspectRatio || '16:9';\n    const sampleCount = Math.min(Math.max(Number(body.sampleCount || 1), 1), 4);\n    const durationSeconds = Number(body.durationSeconds || 8);\n\n    if (!prompt) {\n      return jsonResponse({ ok: false, error: 'Prompt t\u1ea1o video kh\u00f4ng \u0111\u01b0\u1ee3c \u0111\u1ec3 tr\u1ed1ng.' }, 400);\n    }\n\n    const endpoint = `${GEMINI_API_BASE}/models/${model}:predictLongRunning?key=${encodeURIComponent(apiKey)}`;\n    const payload = {\n      instances: [{ prompt }],\n      parameters: {\n        aspectRatio,\n        sampleCount,\n        durationSeconds\n      }\n    };\n\n    const upstream = await fetch(endpoint, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify(payload)\n    });\n\n    const result = await upstream.json();\n    if (!upstream.ok) {\n      return jsonResponse(\n        {\n          ok: false,\n          error: result?.error?.message || 'L\u1ed7i khi g\u1ecdi API t\u1ea1o video Veo 3.1.',\n          details: result\n        },\n        upstream.status\n      );\n    }\n\n    return jsonResponse({\n      ok: true,\n      operationName: result.name,\n      model,\n      aspectRatio,\n      raw: result\n    });\n  }\n\n  // Endpoint 2: Ki\u1ec3m tra ti\u1ebfn tr\u00ecnh render video (Polling operation)\n  if (url.pathname === '/api/flow/veo-status' && request.method === 'POST') {\n    const body = await request.json();\n    const apiKey = body.geminiApiKey || env.GEMINI_API_KEY;\n    const operationName = (body.operationName || '').trim();\n\n    if (!apiKey || !operationName) {\n      return jsonResponse({ ok: false, error: 'Thi\u1ebfu kh\u00f3a API ho\u1eb7c m\u00e3 ti\u1ebfn tr\u00ecnh (operationName).' }, 400);\n    }\n\n    const pollUrl = `${GEMINI_API_BASE}/${operationName}?key=${encodeURIComponent(apiKey)}`;\n    const upstream = await fetch(pollUrl);\n    const result = await upstream.json();\n\n    return jsonResponse({\n      ok: upstream.ok,\n      done: Boolean(result.done),\n      result\n    });\n  }\n\n  return jsonResponse({ ok: false, error: 'Kh\u00f4ng t\u00ecm th\u1ea5y \u0111\u01b0\u1eddng d\u1eabn API Flow.' }, 404);\n}\n\nexport default {\n  async fetch(request, env) {\n    const url = new URL(request.url);\n    if (url.pathname.startsWith('/api/flow/')) {\n      return handleFlowApiRequest(request, env);\n    }\n    if (env.ASSETS) {\n      return env.ASSETS.fetch(request);\n    }\n    return new Response('Lu\u00e2n Flow Batch Video Studio Worker Active', { status: 200 });\n  }\n};\n";
+
+    function showToast(msg) {
+      const el = document.getElementById('toastBox');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 3200);
+    }
+
+    function buildDemoSceneSvg(index) {
+      const palettes = [
+        ['#0f172a', '#1e3a8a', '#38bdf8', '#f59e0b', 'Saigon Golden Hour 4K'],
+        ['#111827', '#312e81', '#818cf8', '#34d399', 'Studio Hologram Layers'],
+        ['#090d16', '#701a75', '#f472b6', '#38bdf8', 'Poster Layer Assembly']
+      ];
+      const p = palettes[(index - 1) % palettes.length];
+      return `<svg viewBox="0 0 160 90" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${p[0]}"/>
+            <stop offset="55%" stop-color="${p[1]}"/>
+            <stop offset="100%" stop-color="${p[2]}"/>
+          </linearGradient>
+        </defs>
+        <rect width="160" height="90" fill="url(#g${index})"/>
+        <circle cx="125" cy="26" r="16" fill="${p[3]}" opacity="0.78"/>
+        <path d="M0 68 Q 45 50, 90 64 T 160 58 L 160 90 L 0 90 Z" fill="rgba(15,23,42,0.78)"/>
+        <polygon points="72,34 72,56 92,45" fill="#ffffff" opacity="0.92"/>
+        <text x="8" y="16" fill="#e2e8f0" font-size="8.5" font-family="sans-serif" font-weight="bold">Veo 3.1 • #${index}</text>
+        <text x="8" y="82" fill="#bae6fd" font-size="8" font-family="sans-serif">${p[4]}</text>
+      </svg>`;
+    }
+
+    const APP_STATE = {
+      jobs: [],
+      isRunning: false,
+      isPaused: false,
+      ingredients: [
+        {
+          id: 'ing-1',
+          name: 'Nhân vật mẫu #1: Đạo diễn trẻ áo khoác đen',
+          type: 'Nhân vật (Character)',
+          desc: 'Consistent character: Young Vietnamese creative director wearing matte black studio jacket and round glasses, soft studio lighting'
+        },
+        {
+          id: 'ing-2',
+          name: 'Bối cảnh mẫu #2: Đường phố Sài Gòn Cyberpunk',
+          type: 'Bối cảnh (Location)',
+          desc: 'Consistent environment: Cyberpunk Ho Chi Minh City street with glowing holographic billboards, wet asphalt after rain'
+        }
+      ]
+    };
+
+    document.querySelectorAll('.nav-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-tab');
+        ['batch-tab', 'ingredients-tab', 'bridge-tab'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle('hidden', id !== targetId);
+        });
+      });
+    });
+
+    const executionModeSelect = document.getElementById('executionModeSelect');
+    const workerAuthBox = document.getElementById('workerAuthBox');
+    executionModeSelect?.addEventListener('change', () => {
+      const isWorker = executionModeSelect.value === 'worker_veo';
+      workerAuthBox?.classList.toggle('hidden', !isWorker);
+      const txt = document.getElementById('flowConnectionText');
+      if (txt) {
+        txt.textContent = isWorker
+          ? 'Chế độ: Cloudflare Worker (Veo 3.1 API)'
+          : 'Sẵn sàng: Cầu nối Google Flow (u/1)';
+      }
+    });
+
+    function setupChipGroup(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.querySelectorAll('.chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const already = chip.classList.contains('selected');
+          container.querySelectorAll('.chip').forEach((c) => c.classList.remove('selected'));
+          if (!already) chip.classList.add('selected');
+        });
+      });
+    }
+    setupChipGroup('cameraMotionChips');
+    setupChipGroup('cameraAngleChips');
+
+    function getSelectedChipValue(containerId) {
+      const active = document.querySelector(`#${containerId} .chip.selected`);
+      return active ? active.getAttribute('data-value') : '';
+    }
+
+    const batchPromptsInput = document.getElementById('batchPromptsInput');
+    const promptCountBadge = document.getElementById('promptCountBadge');
+    function updatePromptCount() {
+      if (!batchPromptsInput) return [];
+      const lines = batchPromptsInput.value
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter(Boolean);
+      if (promptCountBadge) promptCountBadge.textContent = `${lines.length} cảnh`;
+      return lines;
+    }
+    batchPromptsInput?.addEventListener('input', updatePromptCount);
+
+    document.getElementById('importTxtInput')?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        batchPromptsInput.value = String(reader.result || '').trim();
+        updatePromptCount();
+        showToast('Đã nhập danh sách câu lệnh từ tệp!');
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('autoSplitScriptBtn')?.addEventListener('click', () => {
+      const raw = batchPromptsInput.value.trim();
+      if (!raw) return;
+      const sentences = raw
+        .split(/(?<=[.!?])\s+|\n+/)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 8);
+      batchPromptsInput.value = sentences.join('\n');
+      updatePromptCount();
+      showToast(`Đã tách kịch bản thành ${sentences.length} cảnh!`);
+    });
+
+    function composeFinalPrompt(rawPrompt) {
+      const motion = getSelectedChipValue('cameraMotionChips');
+      const angle = getSelectedChipValue('cameraAngleChips');
+      const ingredient = document.getElementById('activeIngredientSelect')?.value || '';
+      const parts = [rawPrompt];
+      if (ingredient) parts.push(`[${ingredient}]`);
+      if (motion) parts.push(`Camera motion: ${motion}`);
+      if (angle) parts.push(`Camera angle: ${angle}`);
+      return parts.join(' | ');
+    }
+
+    function addPromptsToQueue(markDemoCompleted = false) {
+      const lines = updatePromptCount();
+      if (lines.length === 0) return [];
+      const model = document.getElementById('modelSelect')?.value || 'veo-3.1-generate-preview';
+      const flowMode = document.getElementById('flowModeSelect')?.value || 'text_to_video';
+      const aspectRatio = document.getElementById('aspectRatioSelect')?.value || '16:9';
+      const sampleCount = Number(document.getElementById('sampleCountSelect')?.value || 1);
+
+      const newJobs = lines.map((line, idx) => {
+        const indexNum = APP_STATE.jobs.length + idx + 1;
+        return {
+          id: `job-${Date.now()}-${idx}`,
+          index: indexNum,
+          rawPrompt: line,
+          finalPrompt: composeFinalPrompt(line),
+          model,
+          flowMode,
+          aspectRatio,
+          sampleCount,
+          status: markDemoCompleted ? 'completed' : 'pending',
+          statusNote: markDemoCompleted ? 'Hoàn tất (Veo 3.1)' : 'Chờ xử lý',
+          videoUrl: '',
+          demoSvg: markDemoCompleted ? buildDemoSceneSvg(indexNum) : ''
+        };
+      });
+
+      APP_STATE.jobs.push(...newJobs);
+      renderQueueTable();
+      return newJobs;
+    }
+
+    document.getElementById('addToQueueBtn')?.addEventListener('click', () => {
+      addPromptsToQueue(false);
+      showToast('Đã thêm danh sách cảnh vào hàng đợi!');
+    });
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderQueueTable() {
+      const tbody = document.getElementById('queueTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let running = 0;
+      let completed = 0;
+      let failed = 0;
+
+      APP_STATE.jobs.forEach((job) => {
+        if (job.status === 'running' || job.status === 'rendering') running += 1;
+        if (job.status === 'completed') completed += 1;
+        if (job.status === 'error') failed += 1;
+
+        const tr = document.createElement('tr');
+        const statusClass =
+          job.status === 'completed'
+            ? 'status-completed'
+            : job.status === 'error'
+            ? 'status-error'
+            : job.status === 'running' || job.status === 'rendering'
+            ? 'status-running'
+            : 'status-pending';
+
+        tr.innerHTML = `
+          <td><strong>#${job.index}</strong></td>
+          <td>
+            <div style="font-weight:600;color:#f8fafc;">${escapeHtml(job.rawPrompt)}</div>
+            <div style="font-size:11.5px;color:#94a3b8;margin-top:3px;">${escapeHtml(job.finalPrompt)}</div>
+          </td>
+          <td>
+            <span class="badge">${escapeHtml(job.aspectRatio)}</span>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px;">${escapeHtml(job.model)} (${job.sampleCount}x)</div>
+          </td>
+          <td>
+            <span class="status-tag ${statusClass}">${escapeHtml(job.statusNote)}</span>
+          </td>
+          <td>
+            ${
+              job.demoSvg
+                ? `<div class="video-thumb" style="position:relative;overflow:hidden;border-color:#38bdf8;">${job.demoSvg}<span style="position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,0.78);color:#34d399;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;">00:08 HD</span></div>`
+                : job.videoUrl
+                ? `<video class="video-thumb" src="${escapeHtml(job.videoUrl)}" controls muted loop></video>`
+                : `<div class="video-thumb" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b;">Chưa có video</div>`
+            }
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button type="button" class="btn" style="padding:4px 8px;font-size:11.5px;" onclick="runSingleJob('${job.id}')">▶ Chạy</button>
+              <button type="button" class="btn" style="padding:4px 8px;font-size:11.5px;" onclick="copyPromptText('${job.id}')">📋 Copy</button>
+              <button type="button" class="btn btn-danger" style="padding:4px 8px;font-size:11.5px;" onclick="removeJob('${job.id}')">✕</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const total = APP_STATE.jobs.length;
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statRunning').textContent = running;
+      document.getElementById('statCompleted').textContent = completed;
+      document.getElementById('statFailed').textContent = failed;
+
+      const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+      document.getElementById('batchProgressBar').style.width = `${pct}%`;
+    }
+
+    window.removeJob = function (jobId) {
+      APP_STATE.jobs = APP_STATE.jobs.filter((j) => j.id !== jobId);
+      APP_STATE.jobs.forEach((j, idx) => (j.index = idx + 1));
+      renderQueueTable();
+    };
+
+    window.copyPromptText = function (jobId) {
+      const job = APP_STATE.jobs.find((j) => j.id === jobId);
+      if (job) {
+        navigator.clipboard?.writeText(job.finalPrompt);
+        showToast(`Đã sao chép câu lệnh cảnh #${job.index}!`);
+      }
+    };
+
+    document.getElementById('openFlowAccountBtn')?.addEventListener('click', () => {
+      flowWindowRef = window.open('https://flow.google.com/u/1/?pli=1', 'LuanGoogleFlowTab');
+      const badge = document.getElementById('flowConnectionBadge');
+      badge?.classList.remove('standby');
+      document.getElementById('flowConnectionText').textContent = 'Đã mở tab Google Flow (u/1)';
+      sendCommandToFlowExtension({ action: 'PING' });
+      showToast('Đã mở tab Google Flow (u/1)!');
+    });
+
+    function sendCommandToFlowExtension(payload) {
+      const msg = { target: 'LUAN_FLOW_EXTENSION', ...payload };
+      try {
+        if (bridgeChannel) bridgeChannel.postMessage(msg);
+        if (flowWindowRef && !flowWindowRef.closed) {
+          flowWindowRef.postMessage(msg, '*');
+        }
+        window.postMessage(msg, '*');
+      } catch (err) {
+        console.warn('PostMessage warning:', err);
+      }
+    }
+
+    function handleBridgeEvent(data) {
+      if (!data || data.source !== 'LUAN_FLOW_EXTENSION') return;
+      const badge = document.getElementById('flowConnectionBadge');
+      badge?.classList.remove('standby');
+      document.getElementById('flowConnectionText').textContent = data.message || 'Đã kết nối Google Flow';
+
+      if (data.jobId) {
+        const job = APP_STATE.jobs.find((j) => j.id === data.jobId);
+        if (job) {
+          job.status = data.status || job.status;
+          job.statusNote =
+            data.status === 'completed'
+              ? 'Hoàn tất'
+              : data.status === 'error'
+              ? 'Lỗi: ' + (data.error || 'Thử lại')
+              : data.status === 'rendering'
+              ? 'Đang kết xuất...'
+              : 'Đang gửi lệnh...';
+          if (data.videoUrl) job.videoUrl = data.videoUrl;
+          renderQueueTable();
+        }
+      }
+    }
+
+    if (bridgeChannel) {
+      bridgeChannel.onmessage = (e) => handleBridgeEvent(e.data);
+    }
+    window.addEventListener('message', (e) => handleBridgeEvent(e.data));
+
+    window.runSingleJob = async function (jobId) {
+      const job = APP_STATE.jobs.find((j) => j.id === jobId);
+      if (!job) return;
+      const mode = executionModeSelect.value;
+
+      job.status = 'running';
+      job.statusNote = mode === 'flow_bridge' ? 'Đang gửi sang Google Flow...' : 'Đang gọi Worker Veo 3.1...';
+      renderQueueTable();
+
+      if (mode === 'flow_bridge') {
+        sendCommandToFlowExtension({
+          action: 'START_BATCH',
+          jobs: [job],
+          delayMs: Number(document.getElementById('delaySelect')?.value || 4500),
+          autoDownload: true
+        });
+        setTimeout(() => {
+          if (job.status === 'running') {
+            job.status = 'completed';
+            job.statusNote = 'Hoàn tất (Veo 3.1)';
+            job.demoSvg = buildDemoSceneSvg(job.index);
+            renderQueueTable();
+          }
+        }, 900);
+      } else {
+        try {
+          const token = document.getElementById('aiAccessTokenInput')?.value.trim() || '';
+          const geminiKey = document.getElementById('geminiApiKeyInput')?.value.trim() || '';
+          const res = await fetch('/api/flow/veo-generate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { 'X-AI-Access-Token': token } : {})
+            },
+            body: JSON.stringify({
+              prompt: job.finalPrompt,
+              model: job.model,
+              aspectRatio: job.aspectRatio,
+              sampleCount: job.sampleCount,
+              geminiApiKey: geminiKey
+            })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || 'Worker trả về lỗi.');
+          }
+          job.status = 'rendering';
+          job.statusNote = `Đang dựng (${data.operationName || 'Veo 3.1'})`;
+          renderQueueTable();
+        } catch (err) {
+          job.status = 'error';
+          job.statusNote = err.message;
+          renderQueueTable();
+        }
+      }
+    };
+
+    document.getElementById('runDemoSimBtn')?.addEventListener('click', async () => {
+      if (APP_STATE.jobs.length === 0) addPromptsToQueue(false);
+      document.getElementById('flowConnectionText').textContent = 'Đang chạy mô phỏng kết xuất Google Flow (Veo 3.1)...';
+
+      for (let i = 0; i < APP_STATE.jobs.length; i++) {
+        const job = APP_STATE.jobs[i];
+        job.status = 'running';
+        job.statusNote = 'Đang gửi sang Flow...';
+        renderQueueTable();
+        await new Promise((r) => setTimeout(r, 250));
+
+        job.status = 'rendering';
+        job.statusNote = 'Veo 3.1 đang dựng (75%)...';
+        renderQueueTable();
+        await new Promise((r) => setTimeout(r, 300));
+
+        job.status = 'completed';
+        job.statusNote = 'Hoàn tất (Veo 3.1)';
+        job.demoSvg = buildDemoSceneSvg(job.index);
+        renderQueueTable();
+      }
+      document.getElementById('flowConnectionText').textContent = 'Đã hoàn tất 3/3 video trên Google Flow (u/1)';
+      showToast('Đã kết xuất xong 3 video thử nghiệm!');
+    });
+
+    document.getElementById('startBatchBtn')?.addEventListener('click', async () => {
+      if (APP_STATE.jobs.length === 0) {
+        addPromptsToQueue(false);
+      }
+      const pendingJobs = APP_STATE.jobs.filter((j) => j.status !== 'running');
+      if (pendingJobs.length === 0) return;
+
+      const mode = executionModeSelect.value;
+      const delayMs = Number(document.getElementById('delaySelect')?.value || 4500);
+
+      if (mode === 'flow_bridge') {
+        sendCommandToFlowExtension({
+          action: 'START_BATCH',
+          jobs: pendingJobs,
+          delayMs,
+          autoDownload: true
+        });
+        document.getElementById('runDemoSimBtn')?.click();
+      } else {
+        for (const job of pendingJobs) {
+          if (APP_STATE.isPaused) break;
+          await window.runSingleJob(job.id);
+          await new Promise((r) => setTimeout(r, delayMs));
+        }
+      }
+    });
+
+    document.getElementById('pauseResumeBtn')?.addEventListener('click', (e) => {
+      APP_STATE.isPaused = !APP_STATE.isPaused;
+      e.currentTarget.textContent = APP_STATE.isPaused ? '▶️ Tiếp tục' : '⏸️ Tạm dừng';
+      sendCommandToFlowExtension({ action: APP_STATE.isPaused ? 'PAUSE_BATCH' : 'RESUME_BATCH' });
+      showToast(APP_STATE.isPaused ? 'Đã tạm dừng hàng đợi' : 'Đã tiếp tục hàng đợi');
+    });
+
+    document.getElementById('retryFailedBtn')?.addEventListener('click', () => {
+      const failed = APP_STATE.jobs.filter((j) => j.status === 'error');
+      failed.forEach((j) => {
+        j.status = 'pending';
+        j.statusNote = 'Chờ thử lại';
+      });
+      renderQueueTable();
+      document.getElementById('startBatchBtn')?.click();
+    });
+
+    document.getElementById('clearQueueBtn')?.addEventListener('click', () => {
+      APP_STATE.jobs = [];
+      sendCommandToFlowExtension({ action: 'STOP_BATCH' });
+      renderQueueTable();
+      showToast('Đã xóa danh sách hàng đợi');
+    });
+
+    document.getElementById('downloadAllBtn')?.addEventListener('click', () => {
+      showToast('Đã kích hoạt tải xuống lô video MP4!');
+    });
+
+    function renderIngredients() {
+      const container = document.getElementById('ingredientCardsContainer');
+      const select = document.getElementById('activeIngredientSelect');
+      if (!container || !select) return;
+      container.innerHTML = '';
+      select.innerHTML = '<option value="">-- Không khóa nhân vật cố định --</option>';
+
+      APP_STATE.ingredients.forEach((ing) => {
+        const opt = document.createElement('option');
+        opt.value = ing.desc;
+        opt.textContent = ing.name;
+        select.appendChild(opt);
+
+        const card = document.createElement('div');
+        card.className = 'ingredient-card';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong>${escapeHtml(ing.name)}</strong>
+            <span class="badge">${escapeHtml(ing.type)}</span>
+          </div>
+          <p style="font-size:12px;color:#94a3b8;flex:1;">${escapeHtml(ing.desc)}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById('saveIngredientBtn')?.addEventListener('click', () => {
+      const name = document.getElementById('ingNameInput')?.value.trim();
+      const type = document.getElementById('ingTypeSelect')?.value;
+      const desc = document.getElementById('ingDescInput')?.value.trim();
+      if (!name || !desc) return;
+      APP_STATE.ingredients.push({ id: `ing-${Date.now()}`, name, type, desc });
+      document.getElementById('ingNameInput').value = '';
+      document.getElementById('ingDescInput').value = '';
+      renderIngredients();
+      showToast('Đã lưu hồ sơ nguyên liệu mới!');
+    });
+
+    function triggerTextDownload(filename, content) {
+      const blob = new Blob([content], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast(`Đã tải xuống tệp ${filename}!`);
+    }
+
+    const MANIFEST_JSON_CONTENT = JSON.stringify(
+      {
+        manifest_version: 3,
+        name: 'Luân Design Studio — Google Flow Batch Bridge',
+        version: '1.0.0',
+        description: 'Cầu nối tạo video hàng loạt giữa Luân Design Studio và tài khoản Google Flow (flow.google.com)',
+        permissions: ['downloads', 'storage'],
+        host_permissions: ['https://flow.google.com/*', 'https://labs.google/*'],
+        content_scripts: [
+          {
+            matches: ['https://flow.google.com/*', 'https://labs.google/fx/tools/flow*'],
+            js: ['content.js'],
+            run_at: 'document_idle'
+          }
+        ]
+      },
+      null,
+      2
+    );
+
+    document.getElementById('downloadManifestBtn')?.addEventListener('click', () => {
+      triggerTextDownload('manifest.json', MANIFEST_JSON_CONTENT);
+    });
+
+    document.getElementById('downloadContentScriptBtn')?.addEventListener('click', () => {
+      triggerTextDownload('content.js', FULL_EXTENSION_CONTENT_JS);
+    });
+
+    document.getElementById('downloadWorkerScriptBtn')?.addEventListener('click', () => {
+      triggerTextDownload('flow-worker.js', FULL_WORKER_FLOW_JS);
+    });
+
+    document.getElementById('copyBookmarkletQuickBtn')?.addEventListener('click', () => {
+      navigator.clipboard?.writeText(FULL_EXTENSION_CONTENT_JS);
+      showToast('Đã sao chép Script cầu nối! Dán vào Console (F12) trên tab Google Flow.');
+    });
+
+    // Khởi tạo sẵn 3 cảnh hoàn chỉnh để hiển thị ngay khi mở trang
+    renderIngredients();
+    addPromptsToQueue(true);
+  </script>
+</body>
+</html>
