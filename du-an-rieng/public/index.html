@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sổ tay riêng</title>
+    <meta
+      name="description"
+      content="Sổ ghi chú nhỏ, lưu trên trình duyệt. Dự án Cloudflare Workers mới, tách khỏi ứng dụng cũ."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="mast">
+        <p class="eyebrow">Dự án Cloudflare mới</p>
+        <h1>Sổ tay riêng</h1>
+        <p class="lede">
+          Ghi chú ở lại trên trình duyệt này. Ứng dụng không kết nối trình chỉnh
+          sửa ảnh và không dùng Worker cũ.
+        </p>
+        <p class="status" id="status" role="status">Đang kiểm tra kết nối…</p>
+      </header>
+
+      <form class="composer" id="composer">
+        <label class="field">
+          <span>Ghi chú mới</span>
+          <textarea
+            id="draft"
+            name="draft"
+            rows="4"
+            maxlength="500"
+            required
+            placeholder="Viết một việc cần nhớ"
+          ></textarea>
+        </label>
+        <button type="submit">Lưu ghi chú</button>
+      </form>
+
+      <section class="list-panel" aria-labelledby="list-title">
+        <div class="list-head">
+          <h2 id="list-title">Đã lưu</h2>
+          <button type="button" id="clear" class="ghost">Xoá tất cả</button>
+        </div>
+        <ul id="notes" class="notes"></ul>
+        <p id="empty" class="empty">Chưa có ghi chú.</p>
+      </section>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
