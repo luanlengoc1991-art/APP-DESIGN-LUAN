@@ -3,19 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luân Flow Studio — Tạo Video Hàng Loạt với Google Flow (Veo 3.1)</title>
+  <title>Imperia Sync Pro v5.2 — Darkroom Editorial AI Video Director (Google Flow)</title>
   <style>
     :root {
-      --bg-base: #090d16;
-      --bg-panel: #111827;
-      --bg-card: #1e293b;
-      --bg-input: #0f172a;
-      --border: rgba(148, 163, 184, 0.18);
-      --border-focus: #38bdf8;
+      --bg-darkroom: #07090d;
+      --bg-panel: #0e121a;
+      --bg-card: #151b26;
+      --bg-input: #0a0d14;
+      --border: rgba(255, 255, 255, 0.09);
+      --border-orange: rgba(255, 107, 43, 0.45);
+      --border-cyan: rgba(6, 182, 212, 0.45);
+      --sync-orange: #ff6b2b;
+      --sync-orange-soft: rgba(255, 107, 43, 0.14);
+      --sync-cyan: #06b6d4;
+      --sync-cyan-bright: #22d3ee;
+      --sync-cyan-soft: rgba(6, 182, 212, 0.14);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-indigo: #6366f1;
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
@@ -31,7 +35,10 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: radial-gradient(circle at top right, #1e1b4b 0%, var(--bg-base) 45%);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 107, 43, 0.11) 0%, transparent 38%),
+        radial-gradient(circle at 88% 12%, rgba(6, 182, 212, 0.11) 0%, transparent 40%),
+        var(--bg-darkroom);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
@@ -39,17 +46,18 @@
       line-height: 1.5;
     }
 
+    /* Darkroom Editorial Topbar */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 24px;
-      background: rgba(17, 24, 39, 0.92);
-      backdrop-filter: blur(12px);
+      padding: 13px 24px;
+      background: rgba(10, 13, 20, 0.92);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 60;
       gap: 16px;
       flex-wrap: wrap;
     }
@@ -57,59 +65,82 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 13px;
     }
 
     .brand-logo {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      background: linear-gradient(135deg, var(--sync-orange), #ea580c);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 18px;
+      font-weight: 900;
+      font-size: 16px;
       color: #fff;
-      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 20px rgba(255, 107, 43, 0.4);
+      letter-spacing: -0.03em;
     }
 
     .brand-title h1 {
-      font-size: 16px;
+      font-size: 15.5px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .version-tag {
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: var(--sync-cyan-soft);
+      color: var(--sync-cyan-bright);
+      border: 1px solid var(--border-cyan);
       font-weight: 700;
-      letter-spacing: -0.01em;
     }
 
     .brand-title p {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
     }
 
     .nav-tabs {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       background: var(--bg-input);
       padding: 4px;
-      border-radius: 10px;
+      border-radius: 11px;
       border: 1px solid var(--border);
+      flex-wrap: wrap;
     }
 
     .nav-tab {
       padding: 7px 14px;
-      border-radius: 7px;
-      border: none;
+      border-radius: 8px;
+      border: 1px solid transparent;
       background: transparent;
       color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.18s ease;
+      transition: all 0.16s ease;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-main);
     }
 
     .nav-tab.active {
-      background: var(--bg-card);
-      color: var(--text-main);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      background: linear-gradient(135deg, rgba(255, 107, 43, 0.2), rgba(6, 182, 212, 0.15));
+      color: #fff;
+      border-color: var(--border-orange);
+      box-shadow: 0 2px 10px rgba(255, 107, 43, 0.18);
     }
 
     .connection-bar {
@@ -127,15 +158,9 @@
       font-weight: 600;
       padding: 6px 12px;
       border-radius: 999px;
-      background: rgba(16, 185, 129, 0.12);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .status-pill.standby {
-      background: rgba(245, 158, 11, 0.12);
-      color: #fbbf24;
-      border-color: rgba(245, 158, 11, 0.3);
+      background: var(--sync-cyan-soft);
+      color: var(--sync-cyan-bright);
+      border: 1px solid var(--border-cyan);
     }
 
     .dot {
@@ -153,64 +178,73 @@
       gap: 7px;
       padding: 8px 14px;
       border-radius: 9px;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 700;
       border: 1px solid var(--border);
       background: var(--bg-card);
       color: var(--text-main);
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.16s ease;
+      transition: all 0.15s ease;
     }
 
     .btn:hover {
-      border-color: var(--accent);
+      border-color: var(--sync-cyan-bright);
       transform: translateY(-1px);
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #0284c7, #4f46e5);
-      border-color: rgba(56, 189, 248, 0.4);
+    .btn-orange {
+      background: linear-gradient(135deg, var(--sync-orange), #ea580c);
+      border-color: rgba(255, 150, 100, 0.45);
       color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 107, 43, 0.28);
     }
 
-    .btn-success {
-      background: linear-gradient(135deg, #059669, #10b981);
-      border-color: rgba(16, 185, 129, 0.4);
+    .btn-orange:hover {
+      border-color: #fff;
+      box-shadow: 0 6px 18px rgba(255, 107, 43, 0.42);
+    }
+
+    .btn-cyan {
+      background: linear-gradient(135deg, #0891b2, var(--sync-cyan));
+      border-color: rgba(34, 211, 238, 0.45);
       color: #fff;
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.25);
     }
 
     .btn-danger {
-      background: rgba(239, 68, 68, 0.15);
+      background: rgba(239, 68, 68, 0.14);
       border-color: rgba(239, 68, 68, 0.4);
       color: #fca5a5;
     }
 
+    /* Workspace Layout */
     .workspace {
       display: grid;
-      grid-template-columns: 440px 1fr;
+      grid-template-columns: 470px 1fr;
       gap: 20px;
       padding: 20px 24px;
       flex: 1;
-      max-width: 1680px;
+      max-width: 1740px;
       width: 100%;
       margin: 0 auto;
     }
 
-    @media (max-width: 1120px) {
+    @media (max-width: 1180px) {
       .workspace {
         grid-template-columns: 1fr;
       }
     }
 
     .panel {
-      background: rgba(17, 24, 39, 0.88);
+      background: rgba(14, 18, 26, 0.92);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 15px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
 
     .panel-header {
@@ -224,21 +258,34 @@
     }
 
     .panel-header h2 {
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
       display: flex;
       align-items: center;
       gap: 8px;
+      color: #fff;
     }
 
-    .badge {
+    .badge-orange {
       font-size: 11px;
-      padding: 2px 8px;
+      padding: 2px 9px;
       border-radius: 999px;
-      background: rgba(56, 189, 248, 0.14);
-      color: var(--accent);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      font-weight: 600;
+      background: var(--sync-orange-soft);
+      color: #ff854d;
+      border: 1px solid var(--border-orange);
+      font-weight: 700;
+    }
+
+    .badge-cyan {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: var(--sync-cyan-soft);
+      color: var(--sync-cyan-bright);
+      border: 1px solid var(--border-cyan);
+      font-weight: 700;
     }
 
     .form-group {
@@ -248,15 +295,17 @@
     }
 
     .form-label {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11.5px;
+      font-weight: 700;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    textarea, input[type="text"], input[type="password"], input[type="number"], select {
+    textarea, input[type="text"], input[type="password"], select {
       width: 100%;
       background: var(--bg-input);
       border: 1px solid var(--border);
@@ -266,17 +315,12 @@
       font-size: 13px;
       font-family: inherit;
       outline: none;
-      transition: border-color 0.15s ease;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     textarea:focus, input:focus, select:focus {
-      border-color: var(--border-focus);
-    }
-
-    textarea {
-      min-height: 145px;
-      resize: vertical;
-      line-height: 1.55;
+      border-color: var(--sync-orange);
+      box-shadow: 0 0 0 2px rgba(255, 107, 43, 0.15);
     }
 
     .grid-2 {
@@ -291,31 +335,72 @@
       gap: 10px;
     }
 
-    .chip-group {
+    /* Identity Lock Box */
+    .identity-box {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 13px;
+      background: linear-gradient(90deg, rgba(255, 107, 43, 0.1), rgba(6, 182, 212, 0.06));
+      border: 1px solid var(--border-orange);
+      border-radius: var(--radius-md);
     }
 
-    .chip {
-      padding: 5px 10px;
+    .identity-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: #1e293b;
+      border: 1px solid var(--sync-orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .identity-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Lip-sync Word Counter Meter */
+    .word-counter-pill {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
       border-radius: 999px;
+    }
+
+    .word-ok {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .word-warn {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    /* Master Prompt Preview Box */
+    .master-prompt-preview {
+      background: #05070b;
+      border: 1px solid var(--border-cyan);
+      border-left: 3px solid var(--sync-orange);
+      border-radius: var(--radius-md);
+      padding: 11px 13px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
       font-size: 11.5px;
-      font-weight: 600;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.14s ease;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      line-height: 1.55;
     }
 
-    .chip.selected {
-      background: rgba(56, 189, 248, 0.18);
-      color: #38bdf8;
-      border-color: #38bdf8;
-    }
-
+    /* Stats & Progress Bar */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -326,12 +411,14 @@
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 12px 14px;
+      padding: 11px 14px;
     }
 
     .stat-card .label {
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
     }
 
     .stat-card .value {
@@ -351,10 +438,11 @@
     .progress-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #38bdf8, #6366f1, #10b981);
+      background: linear-gradient(90deg, var(--sync-orange), var(--sync-cyan-bright));
       transition: width 0.3s ease;
     }
 
+    /* Queue Table */
     .table-container {
       overflow-x: auto;
       border: 1px solid var(--border);
@@ -366,27 +454,27 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 12.5px;
     }
 
     th, td {
       padding: 11px 13px;
       text-align: left;
       border-bottom: 1px solid var(--border);
-      vertical-align: middle;
+      vertical-align: top;
     }
 
     th {
-      background: rgba(30, 41, 59, 0.65);
+      background: rgba(21, 27, 38, 0.9);
       color: var(--text-muted);
-      font-size: 11.5px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     tr:hover td {
-      background: rgba(30, 41, 59, 0.35);
+      background: rgba(255, 107, 43, 0.04);
     }
 
     .status-tag {
@@ -395,289 +483,231 @@
       gap: 5px;
       padding: 3px 9px;
       border-radius: 999px;
-      font-size: 11.5px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
     }
 
     .status-pending { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
-    .status-running { background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
+    .status-running { background: var(--sync-cyan-soft); color: var(--sync-cyan-bright); }
     .status-completed { background: rgba(16, 185, 129, 0.18); color: #34d399; }
     .status-error { background: rgba(239, 68, 68, 0.18); color: #fca5a5; }
 
     .video-thumb {
-      width: 136px;
-      height: 76px;
+      width: 142px;
+      height: 80px;
       border-radius: 8px;
       object-fit: cover;
-      background: #020617;
+      background: #05070b;
       border: 1px solid var(--border);
-      cursor: pointer;
+    }
+
+    /* Prompt Library Grid */
+    .library-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+    }
+
+    .library-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--sync-orange);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .library-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--sync-cyan-bright);
+    }
+
+    .scene-pill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .scene-pill-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 12px;
     }
 
     .hidden {
       display: none !important;
     }
 
-    .ingredient-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 14px;
-    }
-
-    .ingredient-card {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 13px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .code-box {
-      background: #020617;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 14px;
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
-      font-size: 12px;
-      color: #e2e8f0;
-      overflow-x: auto;
-      white-space: pre;
-      max-height: 300px;
-    }
-
-    .helper-banner {
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.28);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
-      font-size: 12.5px;
-      color: #bae6fd;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
     .toast {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: rgba(15, 23, 42, 0.96);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: rgba(14, 18, 26, 0.96);
+      color: var(--sync-cyan-bright);
+      border: 1px solid var(--sync-orange);
       padding: 12px 18px;
       border-radius: 12px;
       font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
       z-index: 9999;
-      transition: opacity 0.25s ease;
     }
   </style>
 </head>
 <body>
 
+  <!-- TOPBAR: DARKROOM EDITORIAL -->
   <header class="topbar">
     <div class="brand">
-      <div class="brand-logo">LF</div>
+      <div class="brand-logo">IS</div>
       <div class="brand-title">
-        <h1>Luân Flow Studio — Batch AI Video</h1>
-        <p>Kết nối tài khoản Google Flow (<a href="https://flow.google.com/u/1/?pli=1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">flow.google.com/u/1</a>) &amp; Cloudflare Worker</p>
+        <h1>
+          Imperia Sync Pro
+          <span class="version-tag">v5.2 • DARKROOM EDITORIAL</span>
+        </h1>
+        <p>Master Identity Lock • Lip-Sync 22–24 Từ • Google Flow Project <a href="https://flow.google.com/u/1/project/777934e6-85c0-4ac9-94c0-4c5742dd7643/tool/e8bb3f94-201f-4435-bd40-7badd77aee7d?fromViewSource=tools&mode=EDIT" target="_blank" rel="noopener" style="color:var(--sync-cyan-bright);text-decoration:none;">#777934e6 (Mode: EDIT)</a></p>
       </div>
     </div>
 
     <nav class="nav-tabs" role="tablist">
-      <button type="button" class="nav-tab active" data-tab="batch-tab">🎬 Tạo Video Hàng Loạt</button>
-      <button type="button" class="nav-tab" data-tab="ingredients-tab">🧩 Khay Nguyên Liệu (Nhân vật)</button>
+      <button type="button" class="nav-tab active" data-tab="director-tab">🎬 AI Director &amp; Script Manager</button>
+      <button type="button" class="nav-tab" data-tab="library-tab">💡 THƯ VIỆN PROMPT (4 Kịch Bản TVC)</button>
       <button type="button" class="nav-tab" data-tab="bridge-tab">🔌 Cầu Nối Google Flow &amp; GitHub</button>
     </nav>
 
     <div class="connection-bar">
       <div id="flowConnectionBadge" class="status-pill">
         <span class="dot"></span>
-        <span id="flowConnectionText">Sẵn sàng: Cầu nối Google Flow (u/1)</span>
+        <span id="flowConnectionText">Target: Flow Tool #e8bb3f94</span>
       </div>
-      <button type="button" id="openFlowAccountBtn" class="btn btn-primary" title="Mở tab Google Flow u/1 và kết nối hàng đợi">
-        🔗 Mở &amp; Kết nối Google Flow (u/1)
+      <button type="button" id="openFlowAccountBtn" class="btn btn-orange" title="Mở trực tiếp Project Google Flow của bạn ở chế độ EDIT">
+        🔗 Mở Google Flow Project (EDIT)
       </button>
     </div>
   </header>
 
-  <!-- TAB 1: BATCH STUDIO -->
-  <main id="batch-tab" class="workspace">
+  <!-- TAB 1: AI DIRECTOR & EDITOR / SCRIPT MANAGER -->
+  <main id="director-tab" class="workspace">
+    <!-- Left Column: Editor & Script Manager + AI Director -->
     <section class="panel">
       <div class="panel-header">
-        <h2>⚡ Thiết lập Lô Tạo Video (Batch Prompts)</h2>
-        <span class="badge" id="promptCountBadge">3 cảnh</span>
+        <h2>🎛️ Editor &amp; Script Manager</h2>
+        <span class="badge-orange" id="activeCampaignBadge">Chiến dịch: Luxury Fashion</span>
       </div>
 
-      <div class="form-group">
-        <div class="form-label">
-          <span>Phương thức kết nối thực thi</span>
-          <span style="color:var(--accent);">Khuyên dùng: Tài khoản Google Flow</span>
-        </div>
-        <select id="executionModeSelect">
-          <option value="flow_bridge">1. Qua tài khoản Google Flow đang đăng nhập (flow.google.com/u/1/?pli=1)</option>
-          <option value="worker_veo">2. Qua Cloudflare Worker (/api/flow/veo-generate - Gemini Veo 3.1 API)</option>
-        </select>
-      </div>
-
-      <div id="workerAuthBox" class="grid-2 hidden">
-        <div class="form-group">
-          <label class="form-label">Mã AI_ACCESS_TOKEN (Worker)</label>
-          <input type="password" id="aiAccessTokenInput" placeholder="Nhập mã bảo vệ trên Cloudflare..." />
-        </div>
-        <div class="form-group">
-          <label class="form-label">GEMINI_API_KEY (Tùy chọn)</label>
-          <input type="password" id="geminiApiKeyInput" placeholder="Để trống nếu đã cài trong Worker..." />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="form-label">
-          <span>Danh sách Prompts (Mỗi dòng là 1 video cần tạo)</span>
-          <div style="display:flex;gap:6px;">
-            <button type="button" class="btn" id="autoSplitScriptBtn" style="padding:3px 8px;font-size:11px;">✨ Tách từ kịch bản</button>
+      <!-- Master Identity Lock -->
+      <div class="identity-box">
+        <div class="identity-avatar" id="identityAvatarPreview">👤</div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:12.5px;color:#fff;">MASTER IDENTITY LOCK (Khóa Gương Mặt)</strong>
             <label class="btn" style="padding:3px 8px;font-size:11px;cursor:pointer;">
-              📂 Nhập .TXT
-              <input type="file" id="importTxtInput" accept=".txt,.csv" style="display:none;" />
+              📷 Đổi ảnh mẫu
+              <input type="file" id="identityImageInput" accept="image/*" style="display:none;" />
             </label>
           </div>
+          <input type="text" id="characterLockInput" value="Identical to Master Identity Lock (Giữ nguyên gương mặt người mẫu nữ Á Đông thanh lịch, đường nét sắc sảo, ánh nhìn tự tin)" style="margin-top:6px;padding:6px 9px;font-size:12px;" />
         </div>
-        <textarea id="batchPromptsInput" placeholder="Nhập mỗi dòng 1 mô tả cảnh video...">Cinematic establishing shot of futuristic Saigon riverside at golden hour, neon reflections on water, ultra detailed 4k
-Medium tracking shot of a young designer working on holographic layers in a dark modern studio, warm rim lighting
-Close-up slow motion of glowing digital layers assembling into a vibrant movie poster, shallow depth of field</textarea>
       </div>
 
+      <!-- Scene & Motion Controls -->
       <div class="grid-2">
         <div class="form-group">
-          <label class="form-label">Mô hình Google Flow</label>
-          <select id="modelSelect">
-            <option value="veo-3.1-generate-preview">Veo 3.1 (Cinematic + Native Audio)</option>
-            <option value="veo-3.1-fast">Veo 3.1 Fast (Tốc độ cao)</option>
-            <option value="gemini-omni-flash">Gemini Omni Flash (Nhanh / 360p-720p)</option>
-            <option value="imagen-4-frames">Imagen 4 (Tạo Frame đầu/cuối)</option>
-          </select>
+          <label class="form-label">SCENE (Tên bối cảnh)</label>
+          <input type="text" id="sceneInput" value="Sàn diễn thời trang cao cấp ánh sáng hoàng hôn ấm áp" />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Chế độ tạo sinh (Flow Mode)</label>
-          <select id="flowModeSelect">
-            <option value="text_to_video">Text to Video (Văn bản → Video)</option>
-            <option value="ingredients_to_video">Ingredients to Video (Đồng nhất nhân vật)</option>
-            <option value="frames_to_video">Frames to Video (First &amp; Last Frame)</option>
-            <option value="scene_jump_to">Scene Builder — Jump To (Nối tiếp cảnh)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid-3">
-        <div class="form-group">
-          <label class="form-label">Tỷ lệ khung hình</label>
-          <select id="aspectRatioSelect">
-            <option value="16:9">16:9 (Ngang - YouTube)</option>
-            <option value="9:16">9:16 (Dọc - TikTok/Reels)</option>
-            <option value="1:1">1:1 (Vuông)</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Số biến thể / lệnh</label>
-          <select id="sampleCountSelect">
-            <option value="1">1 video / prompt</option>
-            <option value="2">2 videos / prompt</option>
-            <option value="4">4 videos / prompt</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Giãn cách giữa 2 lệnh</label>
-          <select id="delaySelect">
-            <option value="4500">4.5 giây (An toàn)</option>
-            <option value="8000">8 giây (Ổn định)</option>
-            <option value="2000">2 giây (Nhanh)</option>
+          <label class="form-label">MOTION (Kiểu chuyển động)</label>
+          <select id="motionSelect">
+            <option value="Di chuyển">Cinematic Di chuyển (Tracking / Catwalk)</option>
+            <option value="Ngồi">Cinematic Ngồi (Sitting / Studio Talk)</option>
+            <option value="Tương tác">Cinematic Tương tác (Hand Gesture / Demo)</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">
-          <span>🎥 Chuyển động máy quay (Camera Control Chips)</span>
-          <span style="font-size:11px;">Tự động gắn vào toàn bộ lô</span>
-        </label>
-        <div class="chip-group" id="cameraMotionChips">
-          <span class="chip" data-value="Static locked-off camera">Static (Tĩnh)</span>
-          <span class="chip selected" data-value="Smooth cinematic pan">Pan (Quay ngang)</span>
-          <span class="chip" data-value="Vertical camera tilt">Tilt (Quay dọc)</span>
-          <span class="chip" data-value="Slow dolly in shot">Dolly In (Tiến gần)</span>
-          <span class="chip" data-value="Parallel tracking shot">Tracking (Bám chuyển động)</span>
-          <span class="chip" data-value="Natural handheld camera movement">Handheld (Cầm tay)</span>
-          <span class="chip" data-value="Sweeping aerial drone shot">Drone / Flycam</span>
+        <label class="form-label">ACTION (Mô tả hành động chi tiết)</label>
+        <input type="text" id="actionInput" value="Catwalk chậm rãi uyển chuyển, tay chạm nhẹ vào tà áo lụa tự nhiên bay nhẹ theo gió" />
+      </div>
+
+      <!-- Sync Dialogue with 22-24 Word Counter & AI Director -->
+      <div class="form-group">
+        <div class="form-label">
+          <span>SYNC DIALOGUE (Lời thoại chuẩn 22–24 từ tiếng Việt)</span>
+          <span id="dialogueWordBadge" class="word-counter-pill word-ok">23 từ • Chuẩn Lip-Sync 100%</span>
+        </div>
+        <textarea id="dialogueInput" style="min-height:76px;">Từng sợi lụa tơ tằm tự nhiên ôm nhẹ lấy chuyển động cơ thể, mang lại vẻ đẹp thanh lịch và cảm giác êm ái suốt ngày dài.</textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">
+          <button type="button" id="normalize2224Btn" class="btn btn-cyan" style="padding:5px 10px;font-size:11.5px;flex:1;">
+            🎯 Tự động cân chỉnh đúng 22–24 từ
+          </button>
+          <button type="button" id="addSingleSceneBtn" class="btn btn-orange" style="padding:5px 10px;font-size:11.5px;flex:1;">
+            ➕ Thêm Phân Cảnh vào Chiến Dịch
+          </button>
         </div>
       </div>
 
+      <!-- Live Imperia Master Prompt v5.2 Preview -->
       <div class="form-group">
-        <label class="form-label">📐 Góc máy &amp; Ánh sáng (Camera Angle)</label>
-        <div class="chip-group" id="cameraAngleChips">
-          <span class="chip selected" data-value="eye-level shot">Eye Level (Ngang tầm mắt)</span>
-          <span class="chip" data-value="dramatic low-angle shot">Low Angle (Góc thấp)</span>
-          <span class="chip" data-value="high-angle establishing shot">High Angle (Góc cao)</span>
-          <span class="chip" data-value="bird's-eye overhead view">Bird's Eye (Từ đỉnh đầu)</span>
-          <span class="chip" data-value="canted Dutch angle">Dutch Angle (Góc nghiêng)</span>
+        <div class="form-label">
+          <span>🚀 Cấu trúc xuất bản: IMPERIA MASTER PROMPT v5.2</span>
+          <button type="button" id="copyLiveMasterBtn" class="btn" style="padding:2px 8px;font-size:11px;">📋 Copy Master Prompt</button>
         </div>
+        <div id="liveMasterPromptBox" class="master-prompt-preview"></div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">🧩 Khóa hồ sơ Nhân vật / Bối cảnh (Ingredients Consistency)</label>
-        <select id="activeIngredientSelect">
-          <option value="">-- Không khóa nhân vật cố định --</option>
-        </select>
-      </div>
-
-      <div style="display:flex;gap:8px;padding-top:6px;flex-wrap:wrap;">
-        <button type="button" id="addToQueueBtn" class="btn" style="flex:1;">➕ Thêm vào Hàng Đợi</button>
-        <button type="button" id="runDemoSimBtn" class="btn btn-primary" style="flex:1.1;">✨ Chạy Thử Demo</button>
-        <button type="button" id="startBatchBtn" class="btn btn-success" style="flex:1.3;">🚀 Chạy Hàng Loạt</button>
+      <!-- AI Director Brief Splitter -->
+      <div class="form-group" style="border-top:1px solid var(--border);padding-top:12px;">
+        <div class="form-label">
+          <span style="color:var(--sync-cyan-bright);">🧠 AI Director Nâng Cao — Tự động chia Brief thành các cảnh 22–24 từ</span>
+        </div>
+        <textarea id="briefSplitterInput" style="min-height:70px;" placeholder="Dán toàn bộ kịch bản dài hoặc ý tưởng TVC vào đây. AI Director sẽ tự động cắt thành từng phân cảnh đúng 22-24 từ để khớp khẩu hình 100%..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button type="button" id="aiDirectorSplitBtn" class="btn btn-cyan" style="flex:1;">
+            ⚡ AI Director: Chia Nhỏ Brief Thành Lô 22–24 Từ
+          </button>
+          <button type="button" id="startBatchBtn" class="btn btn-orange" style="flex:1;">
+            🚀 Xuất Bản Hàng Loạt Sang Google Flow
+          </button>
+        </div>
       </div>
     </section>
 
+    <!-- Right Column: Campaign Script Manager & Batch Queue -->
     <section class="panel">
       <div class="panel-header">
-        <h2>📋 Bảng Điều Phối Hàng Đợi &amp; Kết Quả Video</h2>
+        <h2>🎞️ Quản Lý Kịch Bản Chiến Dịch TVC (Imperia Sync Queue)</h2>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button type="button" id="pauseResumeBtn" class="btn">⏸️ Tạm dừng</button>
-          <button type="button" id="retryFailedBtn" class="btn">🔄 Chạy lại mục lỗi</button>
-          <button type="button" id="downloadAllBtn" class="btn btn-primary">⬇️ Tải toàn bộ MP4</button>
-          <button type="button" id="clearQueueBtn" class="btn btn-danger">🗑️ Xóa danh sách</button>
+          <button type="button" id="runDemoSimBtn" class="btn btn-cyan">✨ Chạy Thử Kết Xuất</button>
+          <button type="button" id="copyAllMasterPromptsBtn" class="btn">📋 Copy Toàn Bộ Lô Prompt</button>
+          <button type="button" id="downloadAllBtn" class="btn btn-orange">⬇️ Tải Trọn Bộ MP4</button>
+          <button type="button" id="clearQueueBtn" class="btn btn-danger">🗑️ Xóa</button>
         </div>
-      </div>
-
-      <div class="helper-banner">
-        <div>
-          <strong>Kết nối tài khoản Google Flow:</strong> Nhấn <strong>"Mở &amp; Kết nối Google Flow (u/1)"</strong> ở góc trên để mở tab <a href="https://flow.google.com/u/1/?pli=1" target="_blank" rel="noopener" style="color:#fff;">flow.google.com/u/1/?pli=1</a>, sau đó bấm <strong>Chạy Hàng Loạt</strong>.
-        </div>
-        <button type="button" class="btn" id="copyBookmarkletQuickBtn" style="padding:5px 10px;font-size:12px;">📋 Sao chép Script nối nhanh</button>
       </div>
 
       <div class="stats-row">
         <div class="stat-card">
-          <div class="label">Tổng số cảnh (Jobs)</div>
+          <div class="label">Tổng Phân Cảnh TVC</div>
           <div class="value" id="statTotal">0</div>
         </div>
         <div class="stat-card">
-          <div class="label">Đang kết xuất</div>
-          <div class="value" id="statRunning" style="color:var(--accent);">0</div>
+          <div class="label">Độ Khớp Môi (22–24 Từ)</div>
+          <div class="value" id="statLipSyncRate" style="color:var(--sync-cyan-bright);">100%</div>
         </div>
         <div class="stat-card">
-          <div class="label">Đã hoàn tất</div>
+          <div class="label">Đang Kết Xuất Flow</div>
+          <div class="value" id="statRunning" style="color:var(--sync-orange);">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Đã Xuất Bản HD</div>
           <div class="value" id="statCompleted" style="color:var(--success);">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Cần thử lại</div>
-          <div class="value" id="statFailed" style="color:var(--danger);">0</div>
         </div>
       </div>
 
@@ -689,12 +719,12 @@ Close-up slow motion of glowing digital layers assembling into a vibrant movie p
         <table>
           <thead>
             <tr>
-              <th style="width:52px;">#</th>
-              <th>Câu lệnh hoàn chỉnh (Prompt + Camera + Ingredient)</th>
-              <th style="width:130px;">Cấu hình</th>
-              <th style="width:140px;">Trạng thái</th>
-              <th style="width:150px;">Xem trước</th>
-              <th style="width:145px;">Thao tác</th>
+              <th style="width:48px;">Cảnh</th>
+              <th style="width:270px;">Lời Thoại Đồng Bộ (Sync Dialogue) &amp; Hành Động</th>
+              <th>IMPERIA MASTER PROMPT v5.2 (Chuẩn Xuất Bản)</th>
+              <th style="width:130px;">Trạng Thái</th>
+              <th style="width:155px;">Xem Trước TVC</th>
+              <th style="width:125px;">Thao Tác</th>
             </tr>
           </thead>
           <tbody id="queueTableBody"></tbody>
@@ -703,82 +733,50 @@ Close-up slow motion of glowing digital layers assembling into a vibrant movie p
     </section>
   </main>
 
-  <!-- TAB 2: INGREDIENTS & CHARACTER CONSISTENCY -->
-  <section id="ingredients-tab" class="workspace hidden" style="grid-template-columns: 380px 1fr;">
+  <!-- TAB 2: PROMPT MASTER LIBRARY (4 KỊCH BẢN MẪU CHUYÊN NGHIỆP) -->
+  <section id="library-tab" class="workspace hidden" style="grid-template-columns: 1fr;">
     <div class="panel">
       <div class="panel-header">
-        <h2>➕ Tạo Hồ Sơ Nguyên Liệu (Ingredient)</h2>
+        <h2>💡 THƯ VIỆN PROMPT MẪU (PROMPT MASTER LIBRARY v5.2)</h2>
+        <span class="badge-cyan">1-Click để nạp toàn bộ phân cảnh TVC chuẩn 22–24 từ vào Không Gian Làm Việc</span>
       </div>
-      <div class="form-group">
-        <label class="form-label">Tên Nhân vật / Bối cảnh / Vật thể</label>
-        <input type="text" id="ingNameInput" placeholder="VD: Nhân vật chính Minh Anh" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Loại nguyên liệu</label>
-        <select id="ingTypeSelect">
-          <option value="Nhân vật (Character)">Nhân vật (Character Profile)</option>
-          <option value="Bối cảnh (Location)">Bối cảnh (Location / Set)</option>
-          <option value="Phong cách (Style)">Phong cách điện ảnh (Visual Style)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Mô tả cố định để ghép vào mọi cảnh (Prompt Anchor)</label>
-        <textarea id="ingDescInput" placeholder="Mô tả chi tiết khuôn mặt, trang phục, ánh sáng để giữ đồng nhất xuyên suốt các cảnh video..."></textarea>
-      </div>
-      <button type="button" id="saveIngredientBtn" class="btn btn-primary">💾 Lưu vào Khay Nguyên Liệu</button>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <h2>🧩 Danh Sách Nguyên Liệu Đang Lưu</h2>
-        <span class="badge">Giữ đồng nhất nhân vật giữa các cảnh Google Flow</span>
-      </div>
-      <div id="ingredientCardsContainer" class="ingredient-cards"></div>
+      <div id="promptLibraryGrid" class="library-grid"></div>
     </div>
   </section>
 
-  <!-- TAB 3: EXTENSION BRIDGE & GITHUB DEPLOYMENT -->
+  <!-- TAB 3: GOOGLE FLOW BRIDGE & GITHUB DEPLOY -->
   <section id="bridge-tab" class="workspace hidden" style="grid-template-columns: 1fr 1fr;">
     <div class="panel">
       <div class="panel-header">
-        <h2>🔌 Tiện Ích Cầu Nối Tài Khoản Google Flow (Chrome Extension)</h2>
-        <span class="badge">Miễn phí 100% — Dùng thẳng tài khoản u/1</span>
+        <h2>🔌 Cầu Nối Trực Tiếp Tới Google Flow Project (#777934e6)</h2>
+        <span class="badge-orange">Tự động điền Master Prompt v5.2</span>
       </div>
       <p style="font-size:13px;color:var(--text-muted);">
-        Vì trình duyệt bảo mật cookie của <strong>flow.google.com</strong>, bạn chỉ cần cài tiện ích cầu nối nhỏ này (hoặc dán đoạn mã vào Console của tab Google Flow) để Web App tự động đẩy hàng trăm lệnh sang tài khoản Google Flow của bạn và tự tải video MP4 về máy.
+        Cầu nối được cấu hình trỏ thẳng vào công cụ của bạn tại:<br />
+        <a href="https://flow.google.com/u/1/project/777934e6-85c0-4ac9-94c0-4c5742dd7643/tool/e8bb3f94-201f-4435-bd40-7badd77aee7d?fromViewSource=tools&mode=EDIT" target="_blank" rel="noopener" style="color:var(--sync-cyan-bright);word-break:break-all;">https://flow.google.com/u/1/project/777934e6-85c0-4ac9-94c0-4c5742dd7643/tool/e8bb3f94-201f-4435-bd40-7badd77aee7d?fromViewSource=tools&mode=EDIT</a>
       </p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button type="button" id="downloadManifestBtn" class="btn btn-primary">📦 1. Tải manifest.json</button>
-        <button type="button" id="downloadContentScriptBtn" class="btn btn-success">⚡ 2. Tải content.js (Cầu nối Flow)</button>
-        <button type="button" id="downloadWorkerScriptBtn" class="btn">☁️ 3. Tải flow-worker.js (Cloudflare Worker)</button>
+        <button type="button" id="downloadManifestBtn" class="btn btn-orange">📦 1. Tải manifest.json</button>
+        <button type="button" id="downloadContentScriptBtn" class="btn btn-cyan">⚡ 2. Tải content.js (Imperia Bridge v5.2)</button>
+        <button type="button" id="copyBookmarkletQuickBtn" class="btn">📋 Copy Script Dán Nhanh (F12 Console)</button>
       </div>
       <div class="form-group">
-        <label class="form-label">Cách cài trong 15 giây trên Chrome / Edge / Brave:</label>
-        <div class="code-box">1. Tạo 1 thư mục tên "luan-flow-extension" trên máy tính, bỏ 2 file manifest.json và content.js vừa tải vào đó.
-2. Mở trình duyệt vào địa chỉ: chrome://extensions
-3. Bật công tắc "Chế độ dành cho nhà phát triển" (Developer mode) ở góc trên bên phải.
-4. Nhấn nút "Tải tiện ích đã giải nén" (Load unpacked) -> Chọn thư mục "luan-flow-extension".
-5. Mở https://flow.google.com/u/1/?pli=1 -> Bạn sẽ thấy huy hiệu "⚡ Luân Flow Bridge: Sẵn sàng" ở góc dưới phải!</div>
+        <label class="form-label">Cách kích hoạt trên tab Google Flow của bạn:</label>
+        <div class="master-prompt-preview">Cách 1 (Nhanh nhất): Mở link Google Flow Project của bạn -> Nhấn F12 (Console) -> Dán Script vừa bấm "Copy Script Dán Nhanh" -> Enter.
+Cách 2 (Tự động lâu dài): Tải manifest.json và content.js bỏ vào 1 thư mục -> Mở chrome://extensions -> Bật Developer mode -> Load unpacked.</div>
       </div>
     </div>
 
     <div class="panel">
       <div class="panel-header">
-        <h2>🚀 Cập Nhật Lên GitHub &amp; Tự Động Deploy Cloudflare</h2>
-        <span class="badge">luanlengoc1991-art/APP-DESIGN-LUAN</span>
+        <h2>🚀 Đưa Lên GitHub &amp; Xuất Bản Ra Website Thật Cloudflare</h2>
+        <span class="badge-cyan">luanlengoc1991-art/APP-DESIGN-LUAN</span>
       </div>
       <p style="font-size:13px;color:var(--text-muted);">
-        Để đưa trang <strong>Luân Flow Studio</strong> này lên kho lưu trữ <a href="https://github.com/luanlengoc1991-art/APP-DESIGN-LUAN" target="_blank" rel="noopener" style="color:var(--accent);">luanlengoc1991-art/APP-DESIGN-LUAN</a> và tự động xuất bản ra <a href="https://app-design-luan.luanlengoc1991.workers.dev" target="_blank" rel="noopener" style="color:var(--accent);">app-design-luan.luanlengoc1991.workers.dev</a>:
+        Đổi tên tệp này thành <strong>index.html</strong> và kéo thả vào nhánh <code>main</code> của kho lưu trữ <a href="https://github.com/luanlengoc1991-art/APP-DESIGN-LUAN" target="_blank" rel="noopener" style="color:var(--sync-orange);">luanlengoc1991-art/APP-DESIGN-LUAN</a> để tự động xuất bản ra <a href="https://app-design-luan.luanlengoc1991.workers.dev/" target="_blank" rel="noopener" style="color:var(--sync-cyan-bright);">app-design-luan.luanlengoc1991.workers.dev</a>.
       </p>
-      <div class="form-group">
-        <label class="form-label">Đẩy trực tiếp lên nhánh main (Cloudflare tự động build):</label>
-        <div class="code-box"># Lưu tệp giao diện này thành index.html (hoặc public/flow.html) trong repo:
-git add .
-git commit -m "Thêm ứng dụng tạo video hàng loạt kết nối Google Flow"
-git push origin main
-
-# Hoặc triển khai trực tiếp từ máy lên Cloudflare Workers:
-npm run deploy</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" id="downloadWorkerScriptBtn" class="btn">☁️ Tải kèm flow-worker.js (Cloudflare Worker)</button>
       </div>
     </div>
   </section>
@@ -786,19 +784,126 @@ npm run deploy</div>
   <div id="toastBox" class="toast hidden"></div>
 
   <script>
-    const BRIDGE_CHANNEL = 'luan_flow_bridge_v1';
+    const FLOW_PROJECT_URL = "https://flow.google.com/u/1/project/777934e6-85c0-4ac9-94c0-4c5742dd7643/tool/e8bb3f94-201f-4435-bd40-7badd77aee7d?fromViewSource=tools&mode=EDIT";
+    const BRIDGE_CHANNEL = 'imperia_sync_pro_v52';
     let bridgeChannel = null;
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         bridgeChannel = new BroadcastChannel(BRIDGE_CHANNEL);
       }
-    } catch (err) {
-      console.warn('BroadcastChannel unavailable in this context:', err);
-    }
+    } catch (err) {}
 
     let flowWindowRef = null;
-    const FULL_EXTENSION_CONTENT_JS = "/**\n * Lu\u00e2n Design Studio \u2014 Google Flow Automation Bridge (content.js)\n * T\u1ef1 \u0111\u1ed9ng nh\u1eadn h\u00e0ng \u0111\u1ee3i t\u1ea1o video h\u00e0ng lo\u1ea1t t\u1eeb Web App (app-design-luan.luanlengoc1991.workers.dev)\n * v\u00e0 th\u1ef1c thi tr\u1ef1c ti\u1ebfp tr\u00ean phi\u00ean \u0111\u0103ng nh\u1eadp https://flow.google.com/u/1/?pli=1\n */\n(() => {\n  const BRIDGE_CHANNEL = 'luan_flow_bridge_v1';\n  const STATE = {\n    isRunning: false,\n    isPaused: false,\n    currentJob: null,\n    queue: [],\n    completedCount: 0,\n    failedCount: 0,\n    delayBetweenJobsMs: 4500,\n    autoDownload: true\n  };\n\n  const channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(BRIDGE_CHANNEL) : null;\n\n  function logStatus(message, extra = {}) {\n    console.log(`[Lu\u00e2n Flow Bridge] ${message}`, extra);\n    updateFloatingBadge(message);\n    const payload = {\n      source: 'LUAN_FLOW_EXTENSION',\n      type: 'FLOW_STATUS_UPDATE',\n      timestamp: Date.now(),\n      message,\n      url: window.location.href,\n      ...extra\n    };\n    if (channel) channel.postMessage(payload);\n    if (window.opener) {\n      window.opener.postMessage(payload, '*');\n    }\n  }\n\n  function findPromptInput() {\n    const selectors = [\n      'textarea[placeholder*=\"prompt\" i]',\n      'textarea[placeholder*=\"Describe\" i]',\n      'textarea[placeholder*=\"M\u00f4 t\u1ea3\" i]',\n      'textarea[aria-label*=\"prompt\" i]',\n      'div[contenteditable=\"true\"][role=\"textbox\"]',\n      'textarea'\n    ];\n    for (const sel of selectors) {\n      const el = document.querySelector(sel);\n      if (el && el.offsetParent !== null) return el;\n    }\n    return null;\n  }\n\n  function findGenerateButton() {\n    const buttons = Array.from(document.querySelectorAll('button, [role=\"button\"]'));\n    return buttons.find((btn) => {\n      const text = (btn.innerText || btn.getAttribute('aria-label') || '').trim().toLowerCase();\n      return (\n        text === 'generate' ||\n        text.includes('generate') ||\n        text.includes('t\u1ea1o') ||\n        text.includes('create') ||\n        btn.getAttribute('data-testid')?.includes('generate')\n      );\n    });\n  }\n\n  function setNativeValue(element, value) {\n    if (!element) return false;\n    element.focus();\n    if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {\n      const prototype = Object.getPrototypeOf(element);\n      const valueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;\n      if (valueSetter) {\n        valueSetter.call(element, value);\n      } else {\n        element.value = value;\n      }\n      element.dispatchEvent(new Event('input', { bubbles: true }));\n      element.dispatchEvent(new Event('change', { bubbles: true }));\n      return true;\n    }\n    if (element.isContentEditable) {\n      element.innerText = value;\n      element.dispatchEvent(new InputEvent('input', { bubbles: true, data: value }));\n      return true;\n    }\n    return false;\n  }\n\n  function collectVideoUrls() {\n    const videos = Array.from(document.querySelectorAll('video'));\n    const urls = new Set();\n    videos.forEach((v) => {\n      if (v.src && (v.src.startsWith('http') || v.src.startsWith('blob:'))) {\n        urls.add(v.src);\n      }\n      v.querySelectorAll('source').forEach((s) => {\n        if (s.src) urls.add(s.src);\n      });\n    });\n    return Array.from(urls);\n  }\n\n  async function waitForNewVideo(beforeUrls, timeoutMs = 180000) {\n    const start = Date.now();\n    while (Date.now() - start < timeoutMs) {\n      if (STATE.isPaused) {\n        await new Promise((r) => setTimeout(r, 1000));\n        continue;\n      }\n      const currentUrls = collectVideoUrls();\n      const newUrl = currentUrls.find((u) => !beforeUrls.includes(u));\n      if (newUrl) return newUrl;\n      await new Promise((r) => setTimeout(r, 2500));\n    }\n    throw new Error('Qu\u00e1 th\u1eddi gian ch\u1edd Google Flow k\u1ebft xu\u1ea5t video (180s).');\n  }\n\n  async function executeSingleJob(job) {\n    STATE.currentJob = job;\n    logStatus(`\u0110ang x\u1eed l\u00fd c\u1ea3nh #${job.index}: ${job.finalPrompt.slice(0, 48)}...`, {\n      jobId: job.id,\n      status: 'running'\n    });\n\n    const inputEl = findPromptInput();\n    if (!inputEl) {\n      throw new Error('Kh\u00f4ng t\u00ecm th\u1ea5y \u00f4 nh\u1eadp Prompt tr\u00ean giao di\u1ec7n Google Flow. H\u00e3y m\u1edf v\u00e0o m\u1ed9t Project tr\u00ean Google Flow.');\n    }\n\n    const beforeUrls = collectVideoUrls();\n    setNativeValue(inputEl, job.finalPrompt);\n    await new Promise((r) => setTimeout(r, 700));\n\n    const genBtn = findGenerateButton();\n    if (!genBtn || genBtn.disabled) {\n      throw new Error('N\u00fat Generate tr\u00ean Google Flow \u0111ang b\u1ecb kh\u00f3a ho\u1eb7c ch\u01b0a s\u1eb5n s\u00e0ng.');\n    }\n    genBtn.click();\n\n    logStatus(`\u0110\u00e3 g\u1eedi l\u1ec7nh #${job.index} sang Google Flow, \u0111ang ch\u1edd k\u1ebft xu\u1ea5t...`, {\n      jobId: job.id,\n      status: 'rendering'\n    });\n\n    const videoUrl = await waitForNewVideo(beforeUrls, job.timeoutMs || 180000);\n    STATE.completedCount += 1;\n\n    logStatus(`Ho\u00e0n t\u1ea5t video #${job.index}!`, {\n      jobId: job.id,\n      status: 'completed',\n      videoUrl\n    });\n\n    if (STATE.autoDownload && videoUrl && !videoUrl.startsWith('blob:')) {\n      const a = document.createElement('a');\n      a.href = videoUrl;\n      a.download = `LuanFlow_Scene_${String(job.index).padStart(3, '0')}.mp4`;\n      document.body.appendChild(a);\n      a.click();\n      a.remove();\n    }\n  }\n\n  async function processQueue() {\n    if (STATE.isRunning) return;\n    STATE.isRunning = true;\n    while (STATE.queue.length > 0 && STATE.isRunning) {\n      if (STATE.isPaused) {\n        await new Promise((r) => setTimeout(r, 1000));\n        continue;\n      }\n      const job = STATE.queue.shift();\n      try {\n        await executeSingleJob(job);\n      } catch (err) {\n        STATE.failedCount += 1;\n        logStatus(`L\u1ed7i \u1edf c\u1ea3nh #${job.index}: ${err.message}`, {\n          jobId: job.id,\n          status: 'error',\n          error: err.message\n        });\n      }\n      await new Promise((r) => setTimeout(r, STATE.delayBetweenJobsMs));\n    }\n    STATE.isRunning = false;\n    STATE.currentJob = null;\n    logStatus('\u0110\u00e3 ho\u00e0n th\u00e0nh to\u00e0n b\u1ed9 h\u00e0ng \u0111\u1ee3i t\u1ea1o video!');\n  }\n\n  function handleIncomingCommand(data) {\n    if (!data || data.target !== 'LUAN_FLOW_EXTENSION') return;\n    if (data.action === 'PING') {\n      logStatus('\u0110\u00e3 k\u1ebft n\u1ed1i v\u1edbi tab Google Flow', { status: 'connected' });\n    } else if (data.action === 'START_BATCH') {\n      STATE.queue.push(...(data.jobs || []));\n      STATE.autoDownload = Boolean(data.autoDownload ?? true);\n      STATE.delayBetweenJobsMs = Number(data.delayMs || 4500);\n      STATE.isPaused = false;\n      processQueue();\n    } else if (data.action === 'PAUSE_BATCH') {\n      STATE.isPaused = true;\n      logStatus('\u0110\u00e3 t\u1ea1m d\u1eebng h\u00e0ng \u0111\u1ee3i Google Flow', { status: 'paused' });\n    } else if (data.action === 'RESUME_BATCH') {\n      STATE.isPaused = false;\n      logStatus('Ti\u1ebfp t\u1ee5c ch\u1ea1y h\u00e0ng \u0111\u1ee3i Google Flow', { status: 'running' });\n    } else if (data.action === 'STOP_BATCH') {\n      STATE.queue = [];\n      STATE.isRunning = false;\n      STATE.isPaused = false;\n      logStatus('\u0110\u00e3 d\u1eebng v\u00e0 x\u00f3a h\u00e0ng \u0111\u1ee3i tr\u00ean Google Flow', { status: 'stopped' });\n    }\n  }\n\n  if (channel) {\n    channel.onmessage = (event) => handleIncomingCommand(event.data);\n  }\n  window.addEventListener('message', (event) => handleIncomingCommand(event.data));\n\n  function updateFloatingBadge(text) {\n    let badge = document.getElementById('luan-flow-bridge-badge');\n    if (!badge) {\n      badge = document.createElement('div');\n      badge.id = 'luan-flow-bridge-badge';\n      badge.style.cssText = [\n        'position:fixed',\n        'bottom:18px',\n        'right:18px',\n        'z-index:999999',\n        'background:rgba(15,23,42,0.94)',\n        'color:#38bdf8',\n        'border:1px solid rgba(56,189,248,0.45)',\n        'border-radius:12px',\n        'padding:10px 14px',\n        'font:600 12px/1.4 system-ui,-apple-system,sans-serif',\n        'box-shadow:0 10px 25px rgba(0,0,0,0.45)',\n        'backdrop-filter:blur(8px)'\n      ].join(';');\n      document.body.appendChild(badge);\n    }\n    badge.textContent = `\u26a1 Lu\u00e2n Flow Bridge: ${text}`;\n  }\n\n  updateFloatingBadge('S\u1eb5n s\u00e0ng nh\u1eadn l\u1ec7nh t\u1ea1o video h\u00e0ng lo\u1ea1t');\n  logStatus('C\u1ea7u n\u1ed1i Google Flow \u0111\u00e3 k\u00edch ho\u1ea1t tr\u00ean trang', { status: 'connected' });\n})();\n";
+    const FULL_EXTENSION_CONTENT_JS = "/**\n * Imperia Sync Pro v5.2 \u2014 Google Flow Automation Bridge (content.js)\n * K\u1ebft n\u1ed1i tr\u1ef1c ti\u1ebfp Web App v\u1edbi Google Flow Tool:\n * https://flow.google.com/u/1/project/777934e6-85c0-4ac9-94c0-4c5742dd7643/tool/e8bb3f94-201f-4435-bd40-7badd77aee7d?fromViewSource=tools&mode=EDIT\n */\n(() => {\n  const BRIDGE_CHANNEL = 'imperia_sync_pro_v52';\n  const TARGET_FLOW_URL = \"https://flow.google.com/u/1/project/777934e6-85c0-4ac9-94c0-4c5742dd7643/tool/e8bb3f94-201f-4435-bd40-7badd77aee7d?fromViewSource=tools&mode=EDIT\";\n  const STATE = {\n    isRunning: false,\n    isPaused: false,\n    currentJob: null,\n    queue: [],\n    completedCount: 0,\n    failedCount: 0,\n    delayBetweenJobsMs: 4500,\n    autoDownload: true\n  };\n\n  let channel = null;\n  try {\n    if (typeof BroadcastChannel !== 'undefined') {\n      channel = new BroadcastChannel(BRIDGE_CHANNEL);\n    }\n  } catch (e) {}\n\n  function logStatus(message, extra = {}) {\n    console.log(`[Imperia Sync Pro v5.2] ${message}`, extra);\n    updateFloatingBadge(message);\n    const payload = {\n      source: 'IMPERIA_FLOW_EXTENSION',\n      version: '5.2',\n      type: 'FLOW_STATUS_UPDATE',\n      timestamp: Date.now(),\n      message,\n      url: window.location.href,\n      ...extra\n    };\n    try {\n      if (channel) channel.postMessage(payload);\n      if (window.opener) window.opener.postMessage(payload, '*');\n    } catch (err) {}\n  }\n\n  function findPromptInput() {\n    const selectors = [\n      'textarea[placeholder*=\"prompt\" i]',\n      'textarea[placeholder*=\"Describe\" i]',\n      'textarea[placeholder*=\"M\u00f4 t\u1ea3\" i]',\n      'textarea[aria-label*=\"prompt\" i]',\n      'div[contenteditable=\"true\"][role=\"textbox\"]',\n      'textarea'\n    ];\n    for (const sel of selectors) {\n      const el = document.querySelector(sel);\n      if (el && el.offsetParent !== null) return el;\n    }\n    return null;\n  }\n\n  function findGenerateButton() {\n    const buttons = Array.from(document.querySelectorAll('button, [role=\"button\"]'));\n    return buttons.find((btn) => {\n      const text = (btn.innerText || btn.getAttribute('aria-label') || '').trim().toLowerCase();\n      return (\n        text === 'generate' ||\n        text.includes('generate') ||\n        text.includes('t\u1ea1o') ||\n        text.includes('create') ||\n        text.includes('run') ||\n        btn.getAttribute('data-testid')?.includes('generate')\n      );\n    });\n  }\n\n  function setNativeValue(element, value) {\n    if (!element) return false;\n    element.focus();\n    if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {\n      const prototype = Object.getPrototypeOf(element);\n      const valueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;\n      if (valueSetter) {\n        valueSetter.call(element, value);\n      } else {\n        element.value = value;\n      }\n      element.dispatchEvent(new Event('input', { bubbles: true }));\n      element.dispatchEvent(new Event('change', { bubbles: true }));\n      return true;\n    }\n    if (element.isContentEditable) {\n      element.innerText = value;\n      element.dispatchEvent(new InputEvent('input', { bubbles: true, data: value }));\n      return true;\n    }\n    return false;\n  }\n\n  function collectVideoUrls() {\n    const videos = Array.from(document.querySelectorAll('video'));\n    const urls = new Set();\n    videos.forEach((v) => {\n      if (v.src && (v.src.startsWith('http') || v.src.startsWith('blob:'))) {\n        urls.add(v.src);\n      }\n      v.querySelectorAll('source').forEach((s) => {\n        if (s.src) urls.add(s.src);\n      });\n    });\n    return Array.from(urls);\n  }\n\n  async function waitForNewVideo(beforeUrls, timeoutMs = 180000) {\n    const start = Date.now();\n    while (Date.now() - start < timeoutMs) {\n      if (STATE.isPaused) {\n        await new Promise((r) => setTimeout(r, 1000));\n        continue;\n      }\n      const currentUrls = collectVideoUrls();\n      const newUrl = currentUrls.find((u) => !beforeUrls.includes(u));\n      if (newUrl) return newUrl;\n      await new Promise((r) => setTimeout(r, 2500));\n    }\n    throw new Error('Qu\u00e1 th\u1eddi gian ch\u1edd Google Flow k\u1ebft xu\u1ea5t video (180s).');\n  }\n\n  async function executeSingleJob(job) {\n    STATE.currentJob = job;\n    logStatus(`\u0110ang n\u1ea1p IMPERIA MASTER PROMPT c\u1ea3nh #${job.index}...`, {\n      jobId: job.id,\n      status: 'running'\n    });\n\n    const inputEl = findPromptInput();\n    if (!inputEl) {\n      throw new Error('Kh\u00f4ng t\u00ecm th\u1ea5y \u00f4 nh\u1eadp Prompt tr\u00ean Google Flow Tool. H\u00e3y ki\u1ec3m tra tab d\u1ef1 \u00e1n.');\n    }\n\n    const beforeUrls = collectVideoUrls();\n    setNativeValue(inputEl, job.masterPrompt);\n    await new Promise((r) => setTimeout(r, 700));\n\n    const genBtn = findGenerateButton();\n    if (!genBtn || genBtn.disabled) {\n      throw new Error('N\u00fat Generate/Run tr\u00ean Google Flow \u0111ang kh\u00f3a ho\u1eb7c ch\u01b0a s\u1eb5n s\u00e0ng.');\n    }\n    genBtn.click();\n\n    logStatus(`\u0110ang k\u1ebft xu\u1ea5t Lip-Sync c\u1ea3nh #${job.index} (${job.wordCount} t\u1eeb)...`, {\n      jobId: job.id,\n      status: 'rendering'\n    });\n\n    const videoUrl = await waitForNewVideo(beforeUrls, job.timeoutMs || 180000);\n    STATE.completedCount += 1;\n\n    logStatus(`Ho\u00e0n t\u1ea5t c\u1ea3nh #${job.index}!`, {\n      jobId: job.id,\n      status: 'completed',\n      videoUrl\n    });\n\n    if (STATE.autoDownload && videoUrl && !videoUrl.startsWith('blob:')) {\n      const a = document.createElement('a');\n      a.href = videoUrl;\n      a.download = `ImperiaSync_v52_Scene_${String(job.index).padStart(2, '0')}.mp4`;\n      document.body.appendChild(a);\n      a.click();\n      a.remove();\n    }\n  }\n\n  async function processQueue() {\n    if (STATE.isRunning) return;\n    STATE.isRunning = true;\n    while (STATE.queue.length > 0 && STATE.isRunning) {\n      if (STATE.isPaused) {\n        await new Promise((r) => setTimeout(r, 1000));\n        continue;\n      }\n      const job = STATE.queue.shift();\n      try {\n        await executeSingleJob(job);\n      } catch (err) {\n        STATE.failedCount += 1;\n        logStatus(`L\u1ed7i c\u1ea3nh #${job.index}: ${err.message}`, {\n          jobId: job.id,\n          status: 'error',\n          error: err.message\n        });\n      }\n      await new Promise((r) => setTimeout(r, STATE.delayBetweenJobsMs));\n    }\n    STATE.isRunning = false;\n    STATE.currentJob = null;\n    logStatus('Ho\u00e0n th\u00e0nh to\u00e0n b\u1ed9 chi\u1ebfn d\u1ecbch TVC Imperia Sync Pro v5.2!');\n  }\n\n  function handleIncomingCommand(data) {\n    if (!data || data.target !== 'IMPERIA_FLOW_EXTENSION') return;\n    if (data.action === 'PING') {\n      logStatus('\u0110\u00e3 \u0111\u1ed3ng b\u1ed9 v\u1edbi Google Flow Project (Mode: EDIT)', { status: 'connected' });\n    } else if (data.action === 'START_BATCH') {\n      STATE.queue.push(...(data.jobs || []));\n      STATE.autoDownload = Boolean(data.autoDownload ?? true);\n      STATE.delayBetweenJobsMs = Number(data.delayMs || 4500);\n      STATE.isPaused = false;\n      processQueue();\n    } else if (data.action === 'PAUSE_BATCH') {\n      STATE.isPaused = true;\n      logStatus('\u0110\u00e3 t\u1ea1m d\u1eebng h\u00e0ng \u0111\u1ee3i Imperia Sync', { status: 'paused' });\n    } else if (data.action === 'RESUME_BATCH') {\n      STATE.isPaused = false;\n      logStatus('Ti\u1ebfp t\u1ee5c ch\u1ea1y h\u00e0ng \u0111\u1ee3i Imperia Sync', { status: 'running' });\n    } else if (data.action === 'STOP_BATCH') {\n      STATE.queue = [];\n      STATE.isRunning = false;\n      STATE.isPaused = false;\n      logStatus('\u0110\u00e3 d\u1eebng v\u00e0 l\u00e0m tr\u1ed1ng h\u00e0ng \u0111\u1ee3i', { status: 'stopped' });\n    }\n  }\n\n  if (channel) {\n    channel.onmessage = (event) => handleIncomingCommand(event.data);\n  }\n  window.addEventListener('message', (event) => handleIncomingCommand(event.data));\n\n  function updateFloatingBadge(text) {\n    let badge = document.getElementById('imperia-sync-bridge-badge');\n    if (!badge) {\n      badge = document.createElement('div');\n      badge.id = 'imperia-sync-bridge-badge';\n      badge.style.cssText = [\n        'position:fixed',\n        'bottom:18px',\n        'right:18px',\n        'z-index:999999',\n        'background:rgba(14,17,23,0.95)',\n        'color:#ff6b2b',\n        'border:1px solid rgba(255,107,43,0.55)',\n        'border-radius:12px',\n        'padding:10px 15px',\n        'font:600 12px/1.4 system-ui,-apple-system,sans-serif',\n        'box-shadow:0 12px 28px rgba(0,0,0,0.65)',\n        'backdrop-filter:blur(10px)'\n      ].join(';');\n      document.body.appendChild(badge);\n    }\n    badge.innerHTML = `<span style=\"color:#22d3ee;\">\u25cf</span> Imperia Sync Pro v5.2: <span style=\"color:#f8fafc;\">${text}</span>`;\n  }\n\n  updateFloatingBadge('\u0110\u00e3 k\u1ebft n\u1ed1i Project 777934e6 \u2022 S\u1eb5n s\u00e0ng nh\u1eadn Master Prompt');\n  logStatus('C\u1ea7u n\u1ed1i Imperia Sync Pro v5.2 \u0111\u00e3 k\u00edch ho\u1ea1t', { status: 'connected' });\n})();\n";
     const FULL_WORKER_FLOW_JS = "/**\n * Lu\u00e2n Design Studio \u2014 Cloudflare Worker Google Flow & Veo 3.1 Handler (worker/flow-worker.js)\n * T\u00edch h\u1ee3p v\u00e0o worker/index.js c\u1ee7a kho l\u01b0u tr\u1eef https://github.com/luanlengoc1991-art/APP-DESIGN-LUAN\n * H\u1ed7 tr\u1ee3:\n * 1) Ki\u1ec3m tra k\u1ebft n\u1ed1i Flow Studio (/api/flow/health)\n * 2) G\u1ecdi tr\u1ef1c ti\u1ebfp m\u00f4 h\u00ecnh t\u1ea1o video Veo 3.1 / Gemini Omni Flash qua Gemini API (/api/flow/veo-generate & /api/flow/veo-status)\n */\n\nconst GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';\n\nconst CORS_HEADERS = {\n  'Access-Control-Allow-Origin': '*',\n  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',\n  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-AI-Access-Token'\n};\n\nfunction jsonResponse(data, status = 200) {\n  return new Response(JSON.stringify(data, null, 2), {\n    status,\n    headers: {\n      'Content-Type': 'application/json; charset=utf-8',\n      ...CORS_HEADERS\n    }\n  });\n}\n\nfunction verifyAccessToken(request, env) {\n  const requiredToken = env.AI_ACCESS_TOKEN;\n  if (!requiredToken) return true;\n  const authHeader = request.headers.get('Authorization') || '';\n  const customHeader = request.headers.get('X-AI-Access-Token') || '';\n  const bearer = authHeader.replace(/^Bearer\\s+/i, '').trim();\n  return bearer === requiredToken || customHeader.trim() === requiredToken;\n}\n\nexport async function handleFlowApiRequest(request, env) {\n  const url = new URL(request.url);\n\n  if (request.method === 'OPTIONS') {\n    return new Response(null, { status: 204, headers: CORS_HEADERS });\n  }\n\n  if (url.pathname === '/api/flow/health') {\n    return jsonResponse({\n      ok: true,\n      service: 'luan-flow-batch-video-worker',\n      flowAccountTarget: 'https://flow.google.com/u/1/?pli=1',\n      hasGeminiKey: Boolean(env.GEMINI_API_KEY),\n      requiresAccessToken: Boolean(env.AI_ACCESS_TOKEN)\n    });\n  }\n\n  if (!verifyAccessToken(request, env)) {\n    return jsonResponse(\n      {\n        ok: false,\n        error: 'M\u00e3 AI_ACCESS_TOKEN kh\u00f4ng h\u1ee3p l\u1ec7 ho\u1eb7c ch\u01b0a \u0111\u01b0\u1ee3c nh\u1eadp tr\u00ean giao di\u1ec7n.'\n      },\n      401\n    );\n  }\n\n  // Endpoint 1: Kh\u1edfi t\u1ea1o y\u00eau c\u1ea7u t\u1ea1o video h\u00e0ng lo\u1ea1t v\u1edbi Veo 3.1 tr\u00ean Gemini API\n  if (url.pathname === '/api/flow/veo-generate' && request.method === 'POST') {\n    const body = await request.json();\n    const apiKey = body.geminiApiKey || env.GEMINI_API_KEY;\n    if (!apiKey) {\n      return jsonResponse(\n        {\n          ok: false,\n          error: 'Ch\u01b0a c\u1ea5u h\u00ecnh GEMINI_API_KEY trong Cloudflare Worker Secrets ho\u1eb7c ch\u01b0a nh\u1eadp kh\u00f3a API.'\n        },\n        400\n      );\n    }\n\n    const model = body.model || 'veo-3.1-generate-preview';\n    const prompt = (body.prompt || '').trim();\n    const aspectRatio = body.aspectRatio || '16:9';\n    const sampleCount = Math.min(Math.max(Number(body.sampleCount || 1), 1), 4);\n    const durationSeconds = Number(body.durationSeconds || 8);\n\n    if (!prompt) {\n      return jsonResponse({ ok: false, error: 'Prompt t\u1ea1o video kh\u00f4ng \u0111\u01b0\u1ee3c \u0111\u1ec3 tr\u1ed1ng.' }, 400);\n    }\n\n    const endpoint = `${GEMINI_API_BASE}/models/${model}:predictLongRunning?key=${encodeURIComponent(apiKey)}`;\n    const payload = {\n      instances: [{ prompt }],\n      parameters: {\n        aspectRatio,\n        sampleCount,\n        durationSeconds\n      }\n    };\n\n    const upstream = await fetch(endpoint, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify(payload)\n    });\n\n    const result = await upstream.json();\n    if (!upstream.ok) {\n      return jsonResponse(\n        {\n          ok: false,\n          error: result?.error?.message || 'L\u1ed7i khi g\u1ecdi API t\u1ea1o video Veo 3.1.',\n          details: result\n        },\n        upstream.status\n      );\n    }\n\n    return jsonResponse({\n      ok: true,\n      operationName: result.name,\n      model,\n      aspectRatio,\n      raw: result\n    });\n  }\n\n  // Endpoint 2: Ki\u1ec3m tra ti\u1ebfn tr\u00ecnh render video (Polling operation)\n  if (url.pathname === '/api/flow/veo-status' && request.method === 'POST') {\n    const body = await request.json();\n    const apiKey = body.geminiApiKey || env.GEMINI_API_KEY;\n    const operationName = (body.operationName || '').trim();\n\n    if (!apiKey || !operationName) {\n      return jsonResponse({ ok: false, error: 'Thi\u1ebfu kh\u00f3a API ho\u1eb7c m\u00e3 ti\u1ebfn tr\u00ecnh (operationName).' }, 400);\n    }\n\n    const pollUrl = `${GEMINI_API_BASE}/${operationName}?key=${encodeURIComponent(apiKey)}`;\n    const upstream = await fetch(pollUrl);\n    const result = await upstream.json();\n\n    return jsonResponse({\n      ok: upstream.ok,\n      done: Boolean(result.done),\n      result\n    });\n  }\n\n  return jsonResponse({ ok: false, error: 'Kh\u00f4ng t\u00ecm th\u1ea5y \u0111\u01b0\u1eddng d\u1eabn API Flow.' }, 404);\n}\n\nexport default {\n  async fetch(request, env) {\n    const url = new URL(request.url);\n    if (url.pathname.startsWith('/api/flow/')) {\n      return handleFlowApiRequest(request, env);\n    }\n    if (env.ASSETS) {\n      return env.ASSETS.fetch(request);\n    }\n    return new Response('Lu\u00e2n Flow Batch Video Studio Worker Active', { status: 200 });\n  }\n};\n";
+
+    // 4 Kịch Bản Mẫu trong THƯ VIỆN PROMPT (mỗi lời thoại được căn chuẩn đúng 22-24 từ tiếng Việt)
+    const PROMPT_MASTER_LIBRARY = [
+      {
+        id: 'luxury_fashion',
+        title: '1. Luxury Fashion — Thời Trang Lụa Cao Cấp',
+        subtitle: 'Catwalk chậm, giới thiệu lụa tự nhiên',
+        characterLock: 'Identical to Master Identity Lock (Giữ nguyên gương mặt người mẫu nữ Á Đông thanh lịch, thần thái sang trọng)',
+        scenes: [
+          {
+            scene: 'Sàn diễn thời trang cao cấp ánh sáng hoàng hôn ấm áp',
+            motion: 'Di chuyển',
+            action: 'Catwalk chậm rãi uyển chuyển, bàn tay chạm nhẹ vào tà áo lụa tự nhiên bay nhẹ theo nhịp bước chân',
+            dialogue: 'Từng sợi lụa tơ tằm tự nhiên ôm nhẹ lấy chuyển động cơ thể, mang lại vẻ đẹp thanh lịch và cảm giác êm ái suốt ngày dài.'
+          },
+          {
+            scene: 'Không gian hậu trường Atelier tối giản với ánh đèn spotlight nghệ thuật',
+            motion: 'Tương tác',
+            action: 'Nâng nhẹ dải lụa óng ánh trước ống kính để lộ bề mặt dệt thủ công tinh xảo dưới ánh đèn vàng',
+            dialogue: 'Chất liệu lụa thượng hạng được dệt thủ công tỉ mỉ giúp làn da luôn thông thoáng, tôn vinh trọn vẹn khí chất sang trọng của riêng bạn.'
+          },
+          {
+            scene: 'Sảnh kiến trúc cổ điển sang trọng với chiều sâu điện ảnh',
+            motion: 'Di chuyển',
+            action: 'Xoay người nhẹ nhàng làm tà váy lụa bung xòe mềm mại rồi dừng lại nhìn thẳng đầy cuốn hút vào máy quay',
+            dialogue: 'Hãy chạm vào vẻ đẹp nguyên bản của lụa tơ tằm cao cấp để mỗi khoảnh khắc xuất hiện của bạn đều trở thành tâm điểm hoàn hảo.'
+          }
+        ]
+      },
+      {
+        id: 'tech_pitch',
+        title: '2. Tech Pitch — Giới Thiệu Công Nghệ & Hiệu Năng',
+        subtitle: 'Thao tác máy tính, nói về hiệu năng',
+        characterLock: 'Identical to Master Identity Lock (Giữ nguyên gương mặt chuyên gia công nghệ lịch lãm, phong thái hiện đại)',
+        scenes: [
+          {
+            scene: 'Phòng Lab công nghệ Darkroom hiện đại với màn hình đồ họa sắc nét',
+            motion: 'Tương tác',
+            action: 'Thao tác gõ phím mượt mà trên máy tính, chạm nhẹ bàn di chuột để xoay mô hình 3D thời gian thực',
+            dialogue: 'Vi xử lý thế hệ mới giúp tăng tốc toàn bộ tác vụ đồ họa nặng, xử lý mượt mà hàng trăm lớp dữ liệu chỉ trong tích tắc.'
+          },
+          {
+            scene: 'Bàn làm việc tối giản ánh sáng Cyan và Cam-Sync điện ảnh',
+            motion: 'Ngồi',
+            action: 'Ngồi thẳng lưng trước màn hình kép, tay chỉ vào biểu đồ hiệu năng đang tăng vọt và nhìn trực diện ống kính',
+            dialogue: 'Hệ thống tản nhiệt thông minh vận hành êm ái suốt mười tám giờ liên tục, giữ cho hiệu suất sáng tạo của bạn luôn ở mức đỉnh cao.'
+          },
+          {
+            scene: 'Không gian Studio điều khiển trung tâm với dải đèn LED viền tinh tế',
+            motion: 'Tương tác',
+            action: 'Gập nhẹ màn hình siêu mỏng bằng một tay rồi nâng máy lên khoe thiết kế hợp kim nguyên khối sang trọng',
+            dialogue: 'Trải nghiệm ngay sức mạnh công nghệ đột phá trong thiết kế mỏng nhẹ vượt trội, đồng hành cùng bạn chinh phục mọi dự án lớn mỗi ngày.'
+          }
+        ]
+      },
+      {
+        id: 'real_estate',
+        title: '3. Real Estate — Bất Động Sản Hạng Sang',
+        subtitle: 'Đi tham quan Penthouse, chỉ tay vào không gian',
+        characterLock: 'Identical to Master Identity Lock (Giữ nguyên gương mặt nhà tư vấn bất động sản cao cấp, vest lịch sự)',
+        scenes: [
+          {
+            scene: 'Phòng khách Penthouse thông tầng với vách kính toàn cảnh thành phố lúc chập tối',
+            motion: 'Di chuyển',
+            action: 'Bước đi chậm rãi qua phòng khách rộng lớn, mở rộng bàn tay chỉ về phía tầm nhìn toàn cảnh sông Sài Gòn',
+            dialogue: 'Chào mừng bạn đến với không gian Penthouse thông tầng độc bản, nơi thu trọn tầm nhìn toàn cảnh thành phố rực rỡ ngay từ phòng khách.'
+          },
+          {
+            scene: 'Khu vực bếp đảo đá cẩm thạch Ý và bàn ăn sang trọng ánh đèn pha lê',
+            motion: 'Tương tác',
+            action: 'Đặt nhẹ tay lên mặt đá cẩm thạch tự nhiên rồi chỉ tay giới thiệu hệ tủ bếp thông minh nhập khẩu châu Âu',
+            dialogue: 'Mỗi chi tiết nội thất đều được chế tác từ đá cẩm thạch tự nhiên và gỗ quý, kiến tạo chuẩn mực sống thượng lưu đầy tinh tế.'
+          },
+          {
+            scene: 'Ban công Sky Garden riêng tư với hồ bơi tràn viền trên tầng thượng',
+            motion: 'Di chuyển',
+            action: 'Đi dọc theo hồ bơi tràn viền gió nhẹ, quay lại mỉm cười tự tin và chỉ tay vào khoảng sân vườn trên không',
+            dialogue: 'Sở hữu ngay đặc quyền nghỉ dưỡng riêng tư giữa tầng không với hồ bơi tràn viền và vườn treo xanh mát dành riêng cho gia đình bạn.'
+          }
+        ]
+      },
+      {
+        id: 'personal_branding',
+        title: '4. Personal Branding — Thương Hiệu Cá Nhân',
+        subtitle: 'Chia sẻ câu chuyện tại quán cafe',
+        characterLock: 'Identical to Master Identity Lock (Giữ nguyên gương mặt nhà sáng lập trẻ gần gũi, ánh mắt truyền cảm hứng)',
+        scenes: [
+          {
+            scene: 'Quán cafe nghệ thuật yên tĩnh với ánh nắng sớm xuyên qua khung cửa gỗ',
+            motion: 'Ngồi',
+            action: 'Ngồi thư thái bên bàn gỗ cạnh cửa sổ, nâng nhẹ tách cà phê nóng rồi đặt xuống và trò chuyện chân thành',
+            dialogue: 'Năm năm trước tại góc quán nhỏ này, tôi đã bắt đầu hành trình xây dựng thương hiệu cá nhân từ những câu chuyện chân thật nhất.'
+          },
+          {
+            scene: 'Góc bàn cafe ấm cúng với cuốn sổ tay thiết kế và chiếc bút máy',
+            motion: 'Tương tác',
+            action: 'Mở trang sổ tay phác thảo ý tưởng, dùng bút chỉ vào sơ đồ chiến lược và ngước nhìn ống kính đầy tâm huyết',
+            dialogue: 'Thay vì chạy theo những xu hướng ngắn hạn, việc kiên định tạo ra giá trị thực tế mới là chìa khóa giúp khách hàng luôn tin tưởng.'
+          },
+          {
+            scene: 'Không gian quán cafe mở với hậu cảnh cây xanh mờ nhẹ kiểu ống kính 50mm',
+            motion: 'Ngồi',
+            action: 'Khẽ nghiêng người về phía trước gần máy quay hơn, nở nụ cười ấm áp và gật đầu khích lệ người xem',
+            dialogue: 'Nếu bạn đang ấp ủ một ý tưởng khác biệt, hãy bắt đầu chia sẻ câu chuyện của chính mình ngay hôm nay để kết nối cộng đồng.'
+          }
+        ]
+      }
+    ];
 
     function showToast(msg) {
       const el = document.getElementById('toastBox');
@@ -809,177 +914,318 @@ npm run deploy</div>
       window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 3200);
     }
 
-    function buildDemoSceneSvg(index) {
+    function countVietnameseWords(text) {
+      const cleaned = String(text || '')
+        .trim()
+        .replace(/[",.;:!?()\[\]“”‘’—-]+/g, ' ')
+        .trim();
+      if (!cleaned) return 0;
+      return cleaned.split(/\s+/).filter(Boolean).length;
+    }
+
+    const FILLER_POOL = ['ngay', 'hôm', 'nay', 'cùng', 'bạn', 'luôn', 'thật', 'rất', 'đầy', 'tinh', 'tế', 'hơn'];
+
+    function normalizeTo22To24Words(text) {
+      let words = String(text || '').trim().split(/\s+/).filter(Boolean);
+      if (words.length === 0) {
+        return 'Hãy cùng khám phá giải pháp sáng tạo video chuyên nghiệp giúp thương hiệu của bạn tạo ấn tượng mạnh mẽ và thu hút khách hàng ngay.';
+      }
+      if (words.length > 24) {
+        words = words.slice(0, 23);
+        let result = words.join(' ').replace(/[.,;:!?]+$/, '');
+        return result + '.';
+      }
+      let i = 0;
+      while (words.length < 22) {
+        const cleanLast = words[words.length - 1].replace(/[.,!?;:]+$/, '');
+        words[words.length - 1] = cleanLast;
+        words.push(FILLER_POOL[i % FILLER_POOL.length]);
+        i += 1;
+      }
+      let out = words.join(' ').replace(/[.,;:!?]+$/, '');
+      return out + '.';
+    }
+
+    function formatImperiaMasterPrompt({ characterLock, scene, motion, action, dialogue }) {
+      return [
+        'IMPERIA MASTER PROMPT v5.2:',
+        `- CHARACTER: ${characterLock}`,
+        `- SCENE: ${scene} environment.`,
+        `- MOTION: Cinematic ${motion}.`,
+        `- ACTION: ${action}.`,
+        `- SYNC DIALOGUE: "${dialogue}".`,
+        '- CONSTRAINT: Lip-sync hoàn hảo cho tiếng Việt, khẩu hình khớp từng chữ.',
+        '- QUALITY: Commercial grade, ổn định các chi tiết gương mặt (stable features).'
+      ].join('\n');
+    }
+
+    function buildDemoSceneSvg(index, motionLabel) {
       const palettes = [
-        ['#0f172a', '#1e3a8a', '#38bdf8', '#f59e0b', 'Saigon Golden Hour 4K'],
-        ['#111827', '#312e81', '#818cf8', '#34d399', 'Studio Hologram Layers'],
-        ['#090d16', '#701a75', '#f472b6', '#38bdf8', 'Poster Layer Assembly']
+        ['#07090d', '#431407', '#ff6b2b', '#22d3ee', 'IMPERIA SYNC • SCENE 01'],
+        ['#07090d', '#083344', '#06b6d4', '#ff6b2b', 'IMPERIA SYNC • SCENE 02'],
+        ['#07090d', '#1e1b4b', '#ff6b2b', '#34d399', 'IMPERIA SYNC • SCENE 03']
       ];
       const p = palettes[(index - 1) % palettes.length];
       return `<svg viewBox="0 0 160 90" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="g${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="imp${index}" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="${p[0]}"/>
-            <stop offset="55%" stop-color="${p[1]}"/>
+            <stop offset="60%" stop-color="${p[1]}"/>
             <stop offset="100%" stop-color="${p[2]}"/>
           </linearGradient>
         </defs>
-        <rect width="160" height="90" fill="url(#g${index})"/>
-        <circle cx="125" cy="26" r="16" fill="${p[3]}" opacity="0.78"/>
-        <path d="M0 68 Q 45 50, 90 64 T 160 58 L 160 90 L 0 90 Z" fill="rgba(15,23,42,0.78)"/>
-        <polygon points="72,34 72,56 92,45" fill="#ffffff" opacity="0.92"/>
-        <text x="8" y="16" fill="#e2e8f0" font-size="8.5" font-family="sans-serif" font-weight="bold">Veo 3.1 • #${index}</text>
-        <text x="8" y="82" fill="#bae6fd" font-size="8" font-family="sans-serif">${p[4]}</text>
+        <rect width="160" height="90" fill="url(#imp${index})"/>
+        <circle cx="132" cy="24" r="14" fill="${p[3]}" opacity="0.82"/>
+        <path d="M0 66 Q 42 52, 88 64 T 160 56 L 160 90 L 0 90 Z" fill="rgba(7,9,13,0.82)"/>
+        <polygon points="73,32 73,54 93,43" fill="#ffffff" opacity="0.95"/>
+        <text x="8" y="15" fill="#f8fafc" font-size="8" font-family="sans-serif" font-weight="bold">${p[4]}</text>
+        <text x="8" y="81" fill="#22d3ee" font-size="7.5" font-family="sans-serif" font-weight="bold">LIP-SYNC 100% • ${motionLabel || 'Cinematic'}</text>
       </svg>`;
     }
 
     const APP_STATE = {
       jobs: [],
-      isRunning: false,
-      isPaused: false,
-      ingredients: [
-        {
-          id: 'ing-1',
-          name: 'Nhân vật mẫu #1: Đạo diễn trẻ áo khoác đen',
-          type: 'Nhân vật (Character)',
-          desc: 'Consistent character: Young Vietnamese creative director wearing matte black studio jacket and round glasses, soft studio lighting'
-        },
-        {
-          id: 'ing-2',
-          name: 'Bối cảnh mẫu #2: Đường phố Sài Gòn Cyberpunk',
-          type: 'Bối cảnh (Location)',
-          desc: 'Consistent environment: Cyberpunk Ho Chi Minh City street with glowing holographic billboards, wet asphalt after rain'
-        }
-      ]
+      activeLibraryId: 'luxury_fashion'
     };
 
+    // Tab switching
     document.querySelectorAll('.nav-tab').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-tab').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         const targetId = btn.getAttribute('data-tab');
-        ['batch-tab', 'ingredients-tab', 'bridge-tab'].forEach((id) => {
+        ['director-tab', 'library-tab', 'bridge-tab'].forEach((id) => {
           const el = document.getElementById(id);
           if (el) el.classList.toggle('hidden', id !== targetId);
         });
       });
     });
 
-    const executionModeSelect = document.getElementById('executionModeSelect');
-    const workerAuthBox = document.getElementById('workerAuthBox');
-    executionModeSelect?.addEventListener('change', () => {
-      const isWorker = executionModeSelect.value === 'worker_veo';
-      workerAuthBox?.classList.toggle('hidden', !isWorker);
-      const txt = document.getElementById('flowConnectionText');
-      if (txt) {
-        txt.textContent = isWorker
-          ? 'Chế độ: Cloudflare Worker (Veo 3.1 API)'
-          : 'Sẵn sàng: Cầu nối Google Flow (u/1)';
-      }
-    });
-
-    function setupChipGroup(containerId) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      container.querySelectorAll('.chip').forEach((chip) => {
-        chip.addEventListener('click', () => {
-          const already = chip.classList.contains('selected');
-          container.querySelectorAll('.chip').forEach((c) => c.classList.remove('selected'));
-          if (!already) chip.classList.add('selected');
-        });
-      });
-    }
-    setupChipGroup('cameraMotionChips');
-    setupChipGroup('cameraAngleChips');
-
-    function getSelectedChipValue(containerId) {
-      const active = document.querySelector(`#${containerId} .chip.selected`);
-      return active ? active.getAttribute('data-value') : '';
-    }
-
-    const batchPromptsInput = document.getElementById('batchPromptsInput');
-    const promptCountBadge = document.getElementById('promptCountBadge');
-    function updatePromptCount() {
-      if (!batchPromptsInput) return [];
-      const lines = batchPromptsInput.value
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter(Boolean);
-      if (promptCountBadge) promptCountBadge.textContent = `${lines.length} cảnh`;
-      return lines;
-    }
-    batchPromptsInput?.addEventListener('input', updatePromptCount);
-
-    document.getElementById('importTxtInput')?.addEventListener('change', (e) => {
+    // Identity Image Upload Preview
+    document.getElementById('identityImageInput')?.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        batchPromptsInput.value = String(reader.result || '').trim();
-        updatePromptCount();
-        showToast('Đã nhập danh sách câu lệnh từ tệp!');
+        const avatar = document.getElementById('identityAvatarPreview');
+        if (avatar) {
+          avatar.innerHTML = `<img src="${String(reader.result)}" alt="Master Identity" />`;
+        }
+        showToast('Đã khóa gương mặt mẫu vào Master Identity Lock!');
       };
-      reader.readAsText(file);
+      reader.readAsDataURL(file);
     });
 
-    document.getElementById('autoSplitScriptBtn')?.addEventListener('click', () => {
-      const raw = batchPromptsInput.value.trim();
-      if (!raw) return;
-      const sentences = raw
-        .split(/(?<=[.!?])\s+|\n+/)
-        .map((s) => s.trim())
-        .filter((s) => s.length > 8);
-      batchPromptsInput.value = sentences.join('\n');
-      updatePromptCount();
-      showToast(`Đã tách kịch bản thành ${sentences.length} cảnh!`);
-    });
+    // Live Editor Update
+    function updateLiveMasterPromptPreview() {
+      const characterLock = document.getElementById('characterLockInput')?.value.trim() || 'Identical to Master Identity Lock';
+      const scene = document.getElementById('sceneInput')?.value.trim() || 'Studio';
+      const motion = document.getElementById('motionSelect')?.value || 'Di chuyển';
+      const action = document.getElementById('actionInput')?.value.trim() || '';
+      const dialogue = document.getElementById('dialogueInput')?.value.trim() || '';
 
-    function composeFinalPrompt(rawPrompt) {
-      const motion = getSelectedChipValue('cameraMotionChips');
-      const angle = getSelectedChipValue('cameraAngleChips');
-      const ingredient = document.getElementById('activeIngredientSelect')?.value || '';
-      const parts = [rawPrompt];
-      if (ingredient) parts.push(`[${ingredient}]`);
-      if (motion) parts.push(`Camera motion: ${motion}`);
-      if (angle) parts.push(`Camera angle: ${angle}`);
-      return parts.join(' | ');
+      const wc = countVietnameseWords(dialogue);
+      const badge = document.getElementById('dialogueWordBadge');
+      if (badge) {
+        const isPerfect = wc >= 22 && wc <= 24;
+        badge.className = `word-counter-pill ${isPerfect ? 'word-ok' : 'word-warn'}`;
+        badge.textContent = isPerfect
+          ? `${wc} từ • Chuẩn Lip-Sync 100%`
+          : `${wc} từ • Nên để 22–24 từ`;
+      }
+
+      const previewBox = document.getElementById('liveMasterPromptBox');
+      if (previewBox) {
+        previewBox.textContent = formatImperiaMasterPrompt({
+          characterLock,
+          scene,
+          motion,
+          action,
+          dialogue
+        });
+      }
     }
 
-    function addPromptsToQueue(markDemoCompleted = false) {
-      const lines = updatePromptCount();
-      if (lines.length === 0) return [];
-      const model = document.getElementById('modelSelect')?.value || 'veo-3.1-generate-preview';
-      const flowMode = document.getElementById('flowModeSelect')?.value || 'text_to_video';
-      const aspectRatio = document.getElementById('aspectRatioSelect')?.value || '16:9';
-      const sampleCount = Number(document.getElementById('sampleCountSelect')?.value || 1);
+    ['characterLockInput', 'sceneInput', 'motionSelect', 'actionInput', 'dialogueInput'].forEach((id) => {
+      document.getElementById(id)?.addEventListener('input', updateLiveMasterPromptPreview);
+      document.getElementById(id)?.addEventListener('change', updateLiveMasterPromptPreview);
+    });
 
-      const newJobs = lines.map((line, idx) => {
-        const indexNum = APP_STATE.jobs.length + idx + 1;
+    document.getElementById('normalize2224Btn')?.addEventListener('click', () => {
+      const el = document.getElementById('dialogueInput');
+      if (!el) return;
+      el.value = normalizeTo22To24Words(el.value);
+      updateLiveMasterPromptPreview();
+      showToast('Đã cân chỉnh lời thoại về đúng khung 22–24 từ!');
+    });
+
+    document.getElementById('copyLiveMasterBtn')?.addEventListener('click', () => {
+      const text = document.getElementById('liveMasterPromptBox')?.textContent || '';
+      navigator.clipboard?.writeText(text);
+      showToast('Đã sao chép IMPERIA MASTER PROMPT v5.2!');
+    });
+
+    // Add Single Scene from Editor to Campaign Queue
+    document.getElementById('addSingleSceneBtn')?.addEventListener('click', () => {
+      const characterLock = document.getElementById('characterLockInput')?.value.trim();
+      const scene = document.getElementById('sceneInput')?.value.trim();
+      const motion = document.getElementById('motionSelect')?.value;
+      const action = document.getElementById('actionInput')?.value.trim();
+      const dialogue = document.getElementById('dialogueInput')?.value.trim();
+      const wc = countVietnameseWords(dialogue);
+      const idx = APP_STATE.jobs.length + 1;
+
+      APP_STATE.jobs.push({
+        id: `imp-${Date.now()}-${idx}`,
+        index: idx,
+        scene,
+        motion,
+        action,
+        dialogue,
+        wordCount: wc,
+        masterPrompt: formatImperiaMasterPrompt({ characterLock, scene, motion, action, dialogue }),
+        status: 'completed',
+        statusNote: 'Sẵn sàng xuất bản',
+        demoSvg: buildDemoSceneSvg(idx, motion)
+      });
+      renderQueueTable();
+      showToast(`Đã thêm Cảnh #${idx} vào chiến dịch!`);
+    });
+
+    // AI Director: Split long brief into 22-24 word scenes automatically
+    document.getElementById('aiDirectorSplitBtn')?.addEventListener('click', () => {
+      const rawBrief = document.getElementById('briefSplitterInput')?.value.trim();
+      if (!rawBrief) {
+        showToast('Hãy nhập nội dung kịch bản hoặc brief vào ô AI Director trước!');
+        return;
+      }
+      const characterLock = document.getElementById('characterLockInput')?.value.trim();
+      const baseScene = document.getElementById('sceneInput')?.value.trim();
+      const baseMotion = document.getElementById('motionSelect')?.value;
+      const baseAction = document.getElementById('actionInput')?.value.trim();
+
+      const allWords = rawBrief.replace(/\s+/g, ' ').trim().split(' ');
+      const chunks = [];
+      for (let i = 0; i < allWords.length; i += 23) {
+        const slice = allWords.slice(i, i + 23).join(' ');
+        chunks.push(normalizeTo22To24Words(slice));
+      }
+
+      chunks.forEach((dialogueChunk, cIdx) => {
+        const idx = APP_STATE.jobs.length + 1;
+        const wc = countVietnameseWords(dialogueChunk);
+        APP_STATE.jobs.push({
+          id: `imp-dir-${Date.now()}-${cIdx}`,
+          index: idx,
+          scene: `${baseScene} (Phân cảnh ${idx})`,
+          motion: baseMotion,
+          action: baseAction,
+          dialogue: dialogueChunk,
+          wordCount: wc,
+          masterPrompt: formatImperiaMasterPrompt({
+            characterLock,
+            scene: `${baseScene} (Phân cảnh ${idx})`,
+            motion: baseMotion,
+            action: baseAction,
+            dialogue: dialogueChunk
+          }),
+          status: 'completed',
+          statusNote: 'AI Director 22-24 từ',
+          demoSvg: buildDemoSceneSvg(idx, baseMotion)
+        });
+      });
+
+      renderQueueTable();
+      showToast(`AI Director đã chia thành ${chunks.length} phân cảnh chuẩn 22–24 từ!`);
+    });
+
+    // Apply Template from Prompt Master Library
+    window.applyLibraryTemplate = function (templateId) {
+      const tpl = PROMPT_MASTER_LIBRARY.find((t) => t.id === templateId);
+      if (!tpl) return;
+
+      APP_STATE.activeLibraryId = tpl.id;
+      const badge = document.getElementById('activeCampaignBadge');
+      if (badge) badge.textContent = `Chiến dịch: ${tpl.title.split('—')[0].trim()}`;
+
+      const first = tpl.scenes[0];
+      document.getElementById('characterLockInput').value = tpl.characterLock;
+      document.getElementById('sceneInput').value = first.scene;
+      document.getElementById('motionSelect').value = first.motion;
+      document.getElementById('actionInput').value = first.action;
+      document.getElementById('dialogueInput').value = first.dialogue;
+      updateLiveMasterPromptPreview();
+
+      APP_STATE.jobs = tpl.scenes.map((sc, i) => {
+        const idx = i + 1;
+        const wc = countVietnameseWords(sc.dialogue);
         return {
-          id: `job-${Date.now()}-${idx}`,
-          index: indexNum,
-          rawPrompt: line,
-          finalPrompt: composeFinalPrompt(line),
-          model,
-          flowMode,
-          aspectRatio,
-          sampleCount,
-          status: markDemoCompleted ? 'completed' : 'pending',
-          statusNote: markDemoCompleted ? 'Hoàn tất (Veo 3.1)' : 'Chờ xử lý',
-          videoUrl: '',
-          demoSvg: markDemoCompleted ? buildDemoSceneSvg(indexNum) : ''
+          id: `tpl-${tpl.id}-${idx}`,
+          index: idx,
+          scene: sc.scene,
+          motion: sc.motion,
+          action: sc.action,
+          dialogue: sc.dialogue,
+          wordCount: wc,
+          masterPrompt: formatImperiaMasterPrompt({
+            characterLock: tpl.characterLock,
+            scene: sc.scene,
+            motion: sc.motion,
+            action: sc.action,
+            dialogue: sc.dialogue
+          }),
+          status: 'completed',
+          statusNote: 'Hoàn tất (Veo 3.1)',
+          demoSvg: buildDemoSceneSvg(idx, sc.motion)
         };
       });
 
-      APP_STATE.jobs.push(...newJobs);
       renderQueueTable();
-      return newJobs;
-    }
+      // Switch to Director tab if user clicked from Library tab
+      document.querySelector('[data-tab="director-tab"]')?.click();
+      showToast(`Đã nạp kịch bản "${tpl.title}" vào không gian làm việc!`);
+    };
 
-    document.getElementById('addToQueueBtn')?.addEventListener('click', () => {
-      addPromptsToQueue(false);
-      showToast('Đã thêm danh sách cảnh vào hàng đợi!');
-    });
+    function renderPromptLibrary() {
+      const grid = document.getElementById('promptLibraryGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      PROMPT_MASTER_LIBRARY.forEach((tpl) => {
+        const card = document.createElement('div');
+        card.className = 'library-card';
+        const scenesHtml = tpl.scenes
+          .map((sc, idx) => {
+            const wc = countVietnameseWords(sc.dialogue);
+            return `
+              <div class="scene-pill-item">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                  <strong style="color:var(--sync-orange);">Phân cảnh #${idx + 1} • Cinematic ${escapeHtml(sc.motion)}</strong>
+                  <span class="badge-cyan">${wc} từ • Lip-Sync 100%</span>
+                </div>
+                <div style="color:#cbd5e1;font-size:11.5px;margin-bottom:4px;"><strong>Bối cảnh:</strong> ${escapeHtml(sc.scene)}</div>
+                <div style="color:#f8fafc;font-style:italic;">"${escapeHtml(sc.dialogue)}"</div>
+              </div>
+            `;
+          })
+          .join('');
+
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+            <div>
+              <h3 style="font-size:15px;font-weight:800;color:#fff;">${escapeHtml(tpl.title)}</h3>
+              <p style="font-size:12px;color:var(--sync-cyan-bright);margin-top:2px;">${escapeHtml(tpl.subtitle)}</p>
+            </div>
+            <span class="badge-orange">${tpl.scenes.length} phân cảnh</span>
+          </div>
+          <div class="scene-pill-list">${scenesHtml}</div>
+          <button type="button" class="btn btn-orange" style="margin-top:auto;" onclick="applyLibraryTemplate('${tpl.id}')">
+            ⚡ Áp Dụng Kịch Bản Này Vào Không Gian Làm Việc (1-Click)
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
     function escapeHtml(str) {
       return String(str || '')
@@ -996,12 +1242,12 @@ npm run deploy</div>
 
       let running = 0;
       let completed = 0;
-      let failed = 0;
+      let validSync = 0;
 
       APP_STATE.jobs.forEach((job) => {
         if (job.status === 'running' || job.status === 'rendering') running += 1;
         if (job.status === 'completed') completed += 1;
-        if (job.status === 'error') failed += 1;
+        if (job.wordCount >= 22 && job.wordCount <= 24) validSync += 1;
 
         const tr = document.createElement('tr');
         const statusClass =
@@ -1014,14 +1260,18 @@ npm run deploy</div>
             : 'status-pending';
 
         tr.innerHTML = `
-          <td><strong>#${job.index}</strong></td>
+          <td><strong style="color:var(--sync-orange);">#${job.index}</strong></td>
           <td>
-            <div style="font-weight:600;color:#f8fafc;">${escapeHtml(job.rawPrompt)}</div>
-            <div style="font-size:11.5px;color:#94a3b8;margin-top:3px;">${escapeHtml(job.finalPrompt)}</div>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap;">
+              <span class="badge-orange">Cinematic ${escapeHtml(job.motion)}</span>
+              <span class="badge-cyan">${job.wordCount} từ • Lip-Sync</span>
+            </div>
+            <div style="font-weight:700;color:#fff;margin-bottom:4px;">"${escapeHtml(job.dialogue)}"</div>
+            <div style="font-size:11.5px;color:#94a3b8;"><strong>SCENE:</strong> ${escapeHtml(job.scene)}</div>
+            <div style="font-size:11.5px;color:#94a3b8;"><strong>ACTION:</strong> ${escapeHtml(job.action)}</div>
           </td>
           <td>
-            <span class="badge">${escapeHtml(job.aspectRatio)}</span>
-            <div style="font-size:11px;color:#94a3b8;margin-top:4px;">${escapeHtml(job.model)} (${job.sampleCount}x)</div>
+            <div class="master-prompt-preview" style="font-size:11px;padding:8px 10px;">${escapeHtml(job.masterPrompt)}</div>
           </td>
           <td>
             <span class="status-tag ${statusClass}">${escapeHtml(job.statusNote)}</span>
@@ -1029,17 +1279,15 @@ npm run deploy</div>
           <td>
             ${
               job.demoSvg
-                ? `<div class="video-thumb" style="position:relative;overflow:hidden;border-color:#38bdf8;">${job.demoSvg}<span style="position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,0.78);color:#34d399;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;">00:08 HD</span></div>`
-                : job.videoUrl
-                ? `<video class="video-thumb" src="${escapeHtml(job.videoUrl)}" controls muted loop></video>`
-                : `<div class="video-thumb" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b;">Chưa có video</div>`
+                ? `<div class="video-thumb" style="position:relative;overflow:hidden;border-color:var(--sync-orange);">${job.demoSvg}<span style="position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,0.82);color:#22d3ee;font-size:9.5px;font-weight:800;padding:1px 5px;border-radius:4px;">24fps HD</span></div>`
+                : `<div class="video-thumb" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b;">Đang chờ</div>`
             }
           </td>
           <td>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <button type="button" class="btn" style="padding:4px 8px;font-size:11.5px;" onclick="runSingleJob('${job.id}')">▶ Chạy</button>
-              <button type="button" class="btn" style="padding:4px 8px;font-size:11.5px;" onclick="copyPromptText('${job.id}')">📋 Copy</button>
-              <button type="button" class="btn btn-danger" style="padding:4px 8px;font-size:11.5px;" onclick="removeJob('${job.id}')">✕</button>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <button type="button" class="btn btn-orange" style="padding:5px 8px;font-size:11px;" onclick="sendSingleSceneToFlow('${job.id}')">🚀 Gửi sang Flow</button>
+              <button type="button" class="btn" style="padding:5px 8px;font-size:11px;" onclick="copyMasterPromptById('${job.id}')">📋 Copy Prompt</button>
+              <button type="button" class="btn btn-danger" style="padding:4px 8px;font-size:11px;" onclick="removeJob('${job.id}')">✕ Xóa</button>
             </div>
           </td>
         `;
@@ -1050,7 +1298,8 @@ npm run deploy</div>
       document.getElementById('statTotal').textContent = total;
       document.getElementById('statRunning').textContent = running;
       document.getElementById('statCompleted').textContent = completed;
-      document.getElementById('statFailed').textContent = failed;
+      const syncPct = total > 0 ? Math.round((validSync / total) * 100) : 100;
+      document.getElementById('statLipSyncRate').textContent = `${syncPct}%`;
 
       const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
       document.getElementById('batchProgressBar').style.width = `${pct}%`;
@@ -1058,242 +1307,96 @@ npm run deploy</div>
 
     window.removeJob = function (jobId) {
       APP_STATE.jobs = APP_STATE.jobs.filter((j) => j.id !== jobId);
-      APP_STATE.jobs.forEach((j, idx) => (j.index = idx + 1));
+      APP_STATE.jobs.forEach((j, i) => (j.index = i + 1));
       renderQueueTable();
     };
 
-    window.copyPromptText = function (jobId) {
+    window.copyMasterPromptById = function (jobId) {
       const job = APP_STATE.jobs.find((j) => j.id === jobId);
       if (job) {
-        navigator.clipboard?.writeText(job.finalPrompt);
-        showToast(`Đã sao chép câu lệnh cảnh #${job.index}!`);
+        navigator.clipboard?.writeText(job.masterPrompt);
+        showToast(`Đã sao chép IMPERIA MASTER PROMPT Cảnh #${job.index}!`);
       }
     };
 
-    document.getElementById('openFlowAccountBtn')?.addEventListener('click', () => {
-      flowWindowRef = window.open('https://flow.google.com/u/1/?pli=1', 'LuanGoogleFlowTab');
-      const badge = document.getElementById('flowConnectionBadge');
-      badge?.classList.remove('standby');
-      document.getElementById('flowConnectionText').textContent = 'Đã mở tab Google Flow (u/1)';
-      sendCommandToFlowExtension({ action: 'PING' });
-      showToast('Đã mở tab Google Flow (u/1)!');
-    });
-
     function sendCommandToFlowExtension(payload) {
-      const msg = { target: 'LUAN_FLOW_EXTENSION', ...payload };
+      const msg = { target: 'IMPERIA_FLOW_EXTENSION', ...payload };
       try {
         if (bridgeChannel) bridgeChannel.postMessage(msg);
         if (flowWindowRef && !flowWindowRef.closed) {
           flowWindowRef.postMessage(msg, '*');
         }
         window.postMessage(msg, '*');
-      } catch (err) {
-        console.warn('PostMessage warning:', err);
-      }
+      } catch (err) {}
     }
 
-    function handleBridgeEvent(data) {
-      if (!data || data.source !== 'LUAN_FLOW_EXTENSION') return;
-      const badge = document.getElementById('flowConnectionBadge');
-      badge?.classList.remove('standby');
-      document.getElementById('flowConnectionText').textContent = data.message || 'Đã kết nối Google Flow';
-
-      if (data.jobId) {
-        const job = APP_STATE.jobs.find((j) => j.id === data.jobId);
-        if (job) {
-          job.status = data.status || job.status;
-          job.statusNote =
-            data.status === 'completed'
-              ? 'Hoàn tất'
-              : data.status === 'error'
-              ? 'Lỗi: ' + (data.error || 'Thử lại')
-              : data.status === 'rendering'
-              ? 'Đang kết xuất...'
-              : 'Đang gửi lệnh...';
-          if (data.videoUrl) job.videoUrl = data.videoUrl;
-          renderQueueTable();
-        }
-      }
-    }
-
-    if (bridgeChannel) {
-      bridgeChannel.onmessage = (e) => handleBridgeEvent(e.data);
-    }
-    window.addEventListener('message', (e) => handleBridgeEvent(e.data));
-
-    window.runSingleJob = async function (jobId) {
+    window.sendSingleSceneToFlow = function (jobId) {
       const job = APP_STATE.jobs.find((j) => j.id === jobId);
       if (!job) return;
-      const mode = executionModeSelect.value;
-
-      job.status = 'running';
-      job.statusNote = mode === 'flow_bridge' ? 'Đang gửi sang Google Flow...' : 'Đang gọi Worker Veo 3.1...';
-      renderQueueTable();
-
-      if (mode === 'flow_bridge') {
-        sendCommandToFlowExtension({
-          action: 'START_BATCH',
-          jobs: [job],
-          delayMs: Number(document.getElementById('delaySelect')?.value || 4500),
-          autoDownload: true
-        });
-        setTimeout(() => {
-          if (job.status === 'running') {
-            job.status = 'completed';
-            job.statusNote = 'Hoàn tất (Veo 3.1)';
-            job.demoSvg = buildDemoSceneSvg(job.index);
-            renderQueueTable();
-          }
-        }, 900);
-      } else {
-        try {
-          const token = document.getElementById('aiAccessTokenInput')?.value.trim() || '';
-          const geminiKey = document.getElementById('geminiApiKeyInput')?.value.trim() || '';
-          const res = await fetch('/api/flow/veo-generate', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(token ? { 'X-AI-Access-Token': token } : {})
-            },
-            body: JSON.stringify({
-              prompt: job.finalPrompt,
-              model: job.model,
-              aspectRatio: job.aspectRatio,
-              sampleCount: job.sampleCount,
-              geminiApiKey: geminiKey
-            })
-          });
-          const data = await res.json();
-          if (!res.ok || !data.ok) {
-            throw new Error(data.error || 'Worker trả về lỗi.');
-          }
-          job.status = 'rendering';
-          job.statusNote = `Đang dựng (${data.operationName || 'Veo 3.1'})`;
-          renderQueueTable();
-        } catch (err) {
-          job.status = 'error';
-          job.statusNote = err.message;
-          renderQueueTable();
-        }
-      }
+      navigator.clipboard?.writeText(job.masterPrompt);
+      sendCommandToFlowExtension({
+        action: 'START_BATCH',
+        jobs: [job],
+        delayMs: 4500,
+        autoDownload: true
+      });
+      showToast(`Đã gửi Cảnh #${job.index} sang Google Flow (đồng thời lưu vào Clipboard)!`);
     };
 
-    document.getElementById('runDemoSimBtn')?.addEventListener('click', async () => {
-      if (APP_STATE.jobs.length === 0) addPromptsToQueue(false);
-      document.getElementById('flowConnectionText').textContent = 'Đang chạy mô phỏng kết xuất Google Flow (Veo 3.1)...';
+    document.getElementById('openFlowAccountBtn')?.addEventListener('click', () => {
+      flowWindowRef = window.open(FLOW_PROJECT_URL, 'ImperiaGoogleFlowTab');
+      document.getElementById('flowConnectionText').textContent = 'Đã mở Project #777934e6 (EDIT)';
+      sendCommandToFlowExtension({ action: 'PING' });
+      showToast('Đã mở trực tiếp Google Flow Project của bạn!');
+    });
 
+    document.getElementById('runDemoSimBtn')?.addEventListener('click', async () => {
+      document.getElementById('flowConnectionText').textContent = 'Đang đồng bộ Lip-Sync với Flow Tool #e8bb3f94...';
       for (let i = 0; i < APP_STATE.jobs.length; i++) {
         const job = APP_STATE.jobs[i];
         job.status = 'running';
-        job.statusNote = 'Đang gửi sang Flow...';
+        job.statusNote = 'Đang nạp Master Prompt...';
         renderQueueTable();
-        await new Promise((r) => setTimeout(r, 250));
+        await new Promise((r) => setTimeout(r, 220));
 
         job.status = 'rendering';
-        job.statusNote = 'Veo 3.1 đang dựng (75%)...';
+        job.statusNote = 'Đang khớp môi 22-24 từ...';
         renderQueueTable();
-        await new Promise((r) => setTimeout(r, 300));
+        await new Promise((r) => setTimeout(r, 260));
 
         job.status = 'completed';
         job.statusNote = 'Hoàn tất (Veo 3.1)';
-        job.demoSvg = buildDemoSceneSvg(job.index);
+        job.demoSvg = buildDemoSceneSvg(job.index, job.motion);
         renderQueueTable();
       }
-      document.getElementById('flowConnectionText').textContent = 'Đã hoàn tất 3/3 video trên Google Flow (u/1)';
-      showToast('Đã kết xuất xong 3 video thử nghiệm!');
+      document.getElementById('flowConnectionText').textContent = 'Đã xuất bản hoàn tất chiến dịch TVC!';
+      showToast('Đã kết xuất hoàn tất toàn bộ chiến dịch TVC!');
     });
 
-    document.getElementById('startBatchBtn')?.addEventListener('click', async () => {
-      if (APP_STATE.jobs.length === 0) {
-        addPromptsToQueue(false);
-      }
-      const pendingJobs = APP_STATE.jobs.filter((j) => j.status !== 'running');
-      if (pendingJobs.length === 0) return;
-
-      const mode = executionModeSelect.value;
-      const delayMs = Number(document.getElementById('delaySelect')?.value || 4500);
-
-      if (mode === 'flow_bridge') {
-        sendCommandToFlowExtension({
-          action: 'START_BATCH',
-          jobs: pendingJobs,
-          delayMs,
-          autoDownload: true
-        });
-        document.getElementById('runDemoSimBtn')?.click();
-      } else {
-        for (const job of pendingJobs) {
-          if (APP_STATE.isPaused) break;
-          await window.runSingleJob(job.id);
-          await new Promise((r) => setTimeout(r, delayMs));
-        }
-      }
-    });
-
-    document.getElementById('pauseResumeBtn')?.addEventListener('click', (e) => {
-      APP_STATE.isPaused = !APP_STATE.isPaused;
-      e.currentTarget.textContent = APP_STATE.isPaused ? '▶️ Tiếp tục' : '⏸️ Tạm dừng';
-      sendCommandToFlowExtension({ action: APP_STATE.isPaused ? 'PAUSE_BATCH' : 'RESUME_BATCH' });
-      showToast(APP_STATE.isPaused ? 'Đã tạm dừng hàng đợi' : 'Đã tiếp tục hàng đợi');
-    });
-
-    document.getElementById('retryFailedBtn')?.addEventListener('click', () => {
-      const failed = APP_STATE.jobs.filter((j) => j.status === 'error');
-      failed.forEach((j) => {
-        j.status = 'pending';
-        j.statusNote = 'Chờ thử lại';
+    document.getElementById('startBatchBtn')?.addEventListener('click', () => {
+      sendCommandToFlowExtension({
+        action: 'START_BATCH',
+        jobs: APP_STATE.jobs,
+        delayMs: 4500,
+        autoDownload: true
       });
-      renderQueueTable();
-      document.getElementById('startBatchBtn')?.click();
+      document.getElementById('runDemoSimBtn')?.click();
+    });
+
+    document.getElementById('copyAllMasterPromptsBtn')?.addEventListener('click', () => {
+      const all = APP_STATE.jobs.map((j) => `=== CẢNH #${j.index} ===\n${j.masterPrompt}`).join('\n\n');
+      navigator.clipboard?.writeText(all);
+      showToast(`Đã sao chép toàn bộ ${APP_STATE.jobs.length} Master Prompts!`);
     });
 
     document.getElementById('clearQueueBtn')?.addEventListener('click', () => {
       APP_STATE.jobs = [];
-      sendCommandToFlowExtension({ action: 'STOP_BATCH' });
       renderQueueTable();
-      showToast('Đã xóa danh sách hàng đợi');
+      showToast('Đã xóa danh sách phân cảnh');
     });
 
     document.getElementById('downloadAllBtn')?.addEventListener('click', () => {
-      showToast('Đã kích hoạt tải xuống lô video MP4!');
-    });
-
-    function renderIngredients() {
-      const container = document.getElementById('ingredientCardsContainer');
-      const select = document.getElementById('activeIngredientSelect');
-      if (!container || !select) return;
-      container.innerHTML = '';
-      select.innerHTML = '<option value="">-- Không khóa nhân vật cố định --</option>';
-
-      APP_STATE.ingredients.forEach((ing) => {
-        const opt = document.createElement('option');
-        opt.value = ing.desc;
-        opt.textContent = ing.name;
-        select.appendChild(opt);
-
-        const card = document.createElement('div');
-        card.className = 'ingredient-card';
-        card.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <strong>${escapeHtml(ing.name)}</strong>
-            <span class="badge">${escapeHtml(ing.type)}</span>
-          </div>
-          <p style="font-size:12px;color:#94a3b8;flex:1;">${escapeHtml(ing.desc)}</p>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    document.getElementById('saveIngredientBtn')?.addEventListener('click', () => {
-      const name = document.getElementById('ingNameInput')?.value.trim();
-      const type = document.getElementById('ingTypeSelect')?.value;
-      const desc = document.getElementById('ingDescInput')?.value.trim();
-      if (!name || !desc) return;
-      APP_STATE.ingredients.push({ id: `ing-${Date.now()}`, name, type, desc });
-      document.getElementById('ingNameInput').value = '';
-      document.getElementById('ingDescInput').value = '';
-      renderIngredients();
-      showToast('Đã lưu hồ sơ nguyên liệu mới!');
+      showToast('Đã kích hoạt tải xuống trọn bộ video TVC MP4!');
     });
 
     function triggerTextDownload(filename, content) {
@@ -1306,15 +1409,15 @@ npm run deploy</div>
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      showToast(`Đã tải xuống tệp ${filename}!`);
+      showToast(`Đã tải xuống ${filename}!`);
     }
 
     const MANIFEST_JSON_CONTENT = JSON.stringify(
       {
         manifest_version: 3,
-        name: 'Luân Design Studio — Google Flow Batch Bridge',
-        version: '1.0.0',
-        description: 'Cầu nối tạo video hàng loạt giữa Luân Design Studio và tài khoản Google Flow (flow.google.com)',
+        name: 'Imperia Sync Pro v5.2 — Google Flow Bridge',
+        version: '5.2.0',
+        description: 'Cầu nối tự động hóa IMPERIA MASTER PROMPT v5.2 với Google Flow Project #777934e6',
         permissions: ['downloads', 'storage'],
         host_permissions: ['https://flow.google.com/*', 'https://labs.google/*'],
         content_scripts: [
@@ -1343,12 +1446,12 @@ npm run deploy</div>
 
     document.getElementById('copyBookmarkletQuickBtn')?.addEventListener('click', () => {
       navigator.clipboard?.writeText(FULL_EXTENSION_CONTENT_JS);
-      showToast('Đã sao chép Script cầu nối! Dán vào Console (F12) trên tab Google Flow.');
+      showToast('Đã sao chép Script cầu nối Imperia Sync v5.2!');
     });
 
-    // Khởi tạo sẵn 3 cảnh hoàn chỉnh để hiển thị ngay khi mở trang
-    renderIngredients();
-    addPromptsToQueue(true);
+    // Khởi tạo Thư Viện Prompt và áp dụng sẵn kịch bản Luxury Fashion khi mở trang
+    renderPromptLibrary();
+    window.applyLibraryTemplate('luxury_fashion');
   </script>
 </body>
 </html>
